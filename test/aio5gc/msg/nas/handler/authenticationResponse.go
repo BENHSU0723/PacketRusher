@@ -13,7 +13,7 @@ import (
 
 	"fmt"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/util/fsm"
 	log "github.com/sirupsen/logrus"

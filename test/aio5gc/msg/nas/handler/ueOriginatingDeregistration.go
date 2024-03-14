@@ -10,8 +10,8 @@ import (
 	"my5G-RANTester/test/aio5gc/context"
 	"my5G-RANTester/test/aio5gc/msg"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/util/fsm"
 	log "github.com/sirupsen/logrus"

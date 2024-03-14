@@ -18,8 +18,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/free5gc/nas/nasType"
-	"github.com/free5gc/nas/security"
+	"github.com/BENHSU0723/nas/nasType"
+	"github.com/BENHSU0723/nas/security"
 
 	"github.com/free5gc/util/milenage"
 	"github.com/free5gc/util/ueauth"

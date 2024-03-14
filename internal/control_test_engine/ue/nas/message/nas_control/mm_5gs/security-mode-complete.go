@@ -10,9 +10,9 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/context"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 )
 
 // TS 24.501 8.2.26

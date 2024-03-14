@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	"github.com/free5gc/ngap/ngapType"
 )
 

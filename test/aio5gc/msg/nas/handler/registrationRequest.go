@@ -11,12 +11,12 @@ import (
 	"my5G-RANTester/test/aio5gc/msg"
 	"strings"
 
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 	"github.com/free5gc/openapi/models"
 	"github.com/free5gc/util/fsm"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	log "github.com/sirupsen/logrus"
 )
 

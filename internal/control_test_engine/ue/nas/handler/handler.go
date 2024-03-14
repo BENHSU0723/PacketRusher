@@ -15,8 +15,9 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/uePolicyContainer"
 	"github.com/free5gc/openapi/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -294,6 +295,17 @@ func HandlerDlNasTransportPduaccept(ue *context.UEContext, message *nas.Message)
 		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container Type is missing")
 	}
 
+	// n1msg payload container is UE_Policy_Conainer , type is 5(0x0101)
+	if message.DLNASTransport.SpareHalfOctetAndPayloadContainerType.GetPayloadContainerType() == 5 {
+		log.Warn("[UE][NAS] Receive DL NAS Transport, Payload Container Type is 5, UE Policy Container")
+		err := HandlerDlNasTransportUePolicyContainer(ue, message)
+		if err != nil {
+			log.Fatal("[UE][NAS] Occur error when decoding UE_Policy_Container: %+v", err)
+		}
+		log.Warn("[UE][NAS] DL NAS Transport-UE Policy Container, finish the decoding preocedure without error !!")
+		return
+	}
+
 	if message.DLNASTransport.SpareHalfOctetAndPayloadContainerType.GetPayloadContainerType() != 1 {
 		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container Type not expected value")
 	}
@@ -431,6 +443,28 @@ func HandlerDlNasTransportPduaccept(ue *context.UEContext, message *nas.Message)
 	default:
 		log.Error("[UE][NAS] Receiving Unknown Dl NAS Transport message!! ", payloadContainer.GsmHeader.GetMessageType())
 	}
+}
+
+func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.Message) error {
+
+	if reflect.ValueOf(message.DLNASTransport.PayloadContainer).IsZero() || message.DLNASTransport.PayloadContainer.GetPayloadContainerContents() == nil {
+		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is missing")
+	}
+
+	payloadConainer := message.DLNASTransport.PayloadContainer
+	var uePolContainer uePolicyContainer.UePolicyContainer
+	uePolContainer.UePolDeliverySerDecode(payloadConainer.GetPayloadContainerContents())
+
+	switch uePolContainer.GetHeaderMessageType() {
+	case uePolicyContainer.MsgTypeManageUEPolicyCommand:
+		// uePolicyContainer.MsgTypeManageUEPolicyCommand
+		var uePolSecMngLsContent uePolicyContainer.UEPolicySectionManagementListContent
+		uePolSecMngLsContent.UnmarshalBinary(uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent())
+	default:
+
+	}
+
+	return nil
 }
 
 func HandlerIdentityRequest(ue *context.UEContext, message *nas.Message) {

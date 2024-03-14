@@ -8,10 +8,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasConvert"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasConvert"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 )
 
 func GetPduSessionEstablishmentRequest(pduSessionId uint8) (nasPdu []byte) {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"my5G-RANTester/test/aio5gc/context"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/security"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/security"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -9,9 +9,9 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 )
 
 func AuthenticationResponse(authenticationResponseParam []uint8, eapMsg string) (nasPdu []byte) {

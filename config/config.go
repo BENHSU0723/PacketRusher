@@ -10,8 +10,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )

@@ -7,10 +7,11 @@ package mm_5gs
 import (
 	"bytes"
 	"fmt"
-	"github.com/free5gc/nas/nasType"
 	"my5G-RANTester/internal/control_test_engine/ue/context"
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 )
 
 func IdentityResponse(ue *context.UEContext) (nasPdu []byte) {

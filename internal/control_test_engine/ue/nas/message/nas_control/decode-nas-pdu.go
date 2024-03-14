@@ -5,7 +5,7 @@
 package nas_control
 
 import (
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	"github.com/free5gc/ngap/ngapType"
 )
 

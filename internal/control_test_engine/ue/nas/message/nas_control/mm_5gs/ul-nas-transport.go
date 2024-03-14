@@ -12,9 +12,9 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control/sm_5gs"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 
 	"github.com/free5gc/openapi/models"
 )
