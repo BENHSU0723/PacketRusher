@@ -17,7 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/util/fsm"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"

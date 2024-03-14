@@ -13,7 +13,8 @@ import (
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/BENHSU0723/nas/nasType"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
+	freeModels "github.com/free5gc/openapi/models"
 )
 
 func RegistrationAccept(ue *context.UEContext) (nasPdu []byte, err error) {
@@ -57,13 +58,17 @@ func buildRegistrationAccept(ue *context.UEContext) (nasMsg *nas.Message, err er
 	registrationAccept.TAIList = nasType.NewTAIList(nasMessage.RegistrationAcceptTAIListType)
 	var taiList []models.Tai
 	taiList = append(taiList, *ue.GetUserLocationInfo().Tai)
-	taiListNas := nasConvert.TaiListToNas(taiList)
+	var tmp []freeModels.Tai
+	for _, tail := range taiList {
+		tmp = append(tmp, freeModels.Tai{PlmnId: (*freeModels.PlmnId)(tail.PlmnId), Tac: tail.Tac})
+	}
+	taiListNas := nasConvert.TaiListToNas(tmp)
 	registrationAccept.TAIList.SetLen(uint8(len(taiListNas)))
 	registrationAccept.TAIList.SetPartialTrackingAreaIdentityList(taiListNas)
 
 	nssai := ue.GetDefaultSNssai()
 	var buf []uint8
-	buf = append(buf, nasConvert.SnssaiToNas(nssai)...)
+	buf = append(buf, nasConvert.SnssaiToNas(freeModels.Snssai(nssai))...)
 
 	registrationAccept.AllowedNSSAI = nasType.NewAllowedNSSAI(nasMessage.RegistrationAcceptAllowedNSSAIType)
 	registrationAccept.AllowedNSSAI.SetLen(uint8(len(buf)))

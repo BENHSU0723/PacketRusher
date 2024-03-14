@@ -14,6 +14,7 @@ import (
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/BENHSU0723/nas/nasType"
+	freeModels "github.com/free5gc/openapi/models"
 )
 
 func SecurityModeCommand(ue *context.UEContext) ([]byte, error) {
@@ -51,7 +52,7 @@ func buildSecurityModeCommand(ue *context.UEContext) *nas.Message {
 	securityModeCommand.SelectedNASSecurityAlgorithms.SetTypeOfIntegrityProtectionAlgorithm(ue.GetSecurityContext().GetIntegrityAlg())
 	securityModeCommand.SelectedNASSecurityAlgorithms.SetTypeOfCipheringAlgorithm(ue.GetSecurityContext().GetCipheringAlg())
 
-	securityModeCommand.SpareHalfOctetAndNgksi = nasConvert.SpareHalfOctetAndNgksiToNas(ue.GetNgKsi())
+	securityModeCommand.SpareHalfOctetAndNgksi = nasConvert.SpareHalfOctetAndNgksiToNas(freeModels.NgKsi{Tsc: freeModels.ScType(ue.GetNgKsi().Tsc), Ksi: ue.GetNgKsi().Ksi})
 
 	securityModeCommand.ReplayedUESecurityCapabilities.SetLen(ue.GetSecurityCapability().GetLen())
 	securityModeCommand.ReplayedUESecurityCapabilities.Buffer = ue.GetSecurityCapability().Buffer

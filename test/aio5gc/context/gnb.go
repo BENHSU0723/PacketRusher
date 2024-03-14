@@ -9,8 +9,8 @@ import (
 	"my5G-RANTester/test/aio5gc/lib/types"
 	"os"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
 	"github.com/ishidawataru/sctp"
 	log "github.com/sirupsen/logrus"
 )

@@ -14,9 +14,10 @@ import (
 
 	"github.com/free5gc/aper"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
+	free5gcModels "github.com/free5gc/openapi/models"
 )
 
 func PDUSessionResourceSetup(nasPdu []byte, smContext context.SmContext, ue *context.UEContext, session *context.SessionContext) ([]byte, error) {
@@ -219,7 +220,7 @@ func buildPDUSessionResourceSetupListSUReq(
 	list := ngapType.PDUSessionResourceSetupListSUReq{}
 	var item ngapType.PDUSessionResourceSetupItemSUReq
 	item.PDUSessionID.Value = int64(pduSessionId)
-	item.SNSSAI = ngapConvert.SNssaiToNgap(snssai)
+	item.SNSSAI = ngapConvert.SNssaiToNgap(free5gcModels.Snssai(snssai))
 	item.PDUSessionResourceSetupRequestTransfer = transfer
 	if nasPDU != nil {
 		item.PDUSessionNASPDU = new(ngapType.NASPDU)

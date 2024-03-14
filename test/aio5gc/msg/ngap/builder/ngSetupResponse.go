@@ -11,9 +11,10 @@ import (
 
 	"github.com/free5gc/ngap"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
+	freeModels "github.com/free5gc/openapi/models"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -78,7 +79,7 @@ func addProtocolIEServedGUAMIList(servedGuamis []models.Guami) ngapType.NGSetupR
 		regionId, setId, pointerId := ngapConvert.AmfIdToNgap(servedGuamis[i].AmfId)
 		servedGUAMIItem := ngapType.ServedGUAMIItem{
 			GUAMI: ngapType.GUAMI{
-				PLMNIdentity: ngapConvert.PlmnIdToNgap(*servedGuamis[i].PlmnId),
+				PLMNIdentity: ngapConvert.PlmnIdToNgap((freeModels.PlmnId)(*servedGuamis[i].PlmnId)),
 				AMFRegionID: ngapType.AMFRegionID{
 					Value: regionId,
 				},
@@ -118,13 +119,13 @@ func addProtocolIEPLMNSupportList(supportedPlmnSnssai []models.PlmnSnssai) ngapT
 
 		for nssai := range supportedPlmnSnssai[plmn].SNssaiList {
 			sliceSupportItem := ngapType.SliceSupportItem{
-				SNSSAI: ngapConvert.SNssaiToNgap(supportedPlmnSnssai[plmn].SNssaiList[nssai]),
+				SNSSAI: ngapConvert.SNssaiToNgap(freeModels.Snssai(supportedPlmnSnssai[plmn].SNssaiList[nssai])),
 			}
 			sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
 		}
 
 		pLMNSupportItem := ngapType.PLMNSupportItem{
-			PLMNIdentity:     ngapConvert.PlmnIdToNgap(*supportedPlmnSnssai[plmn].PlmnId),
+			PLMNIdentity:     ngapConvert.PlmnIdToNgap(freeModels.PlmnId(*supportedPlmnSnssai[plmn].PlmnId)),
 			SliceSupportList: sliceSupportList,
 		}
 		pLMNSupportList.List = append(pLMNSupportList.List, pLMNSupportItem)
@@ -138,7 +139,12 @@ func NGSetupRequest(req *ngapType.NGSetupRequest, amf context.AMFContext, gnb co
 		switch req.ProtocolIEs.List[ie].Id.Value {
 		case ngapType.ProtocolIEIDGlobalRANNodeID:
 			globalRANNodeID := ngapConvert.RanIdToModels(*req.ProtocolIEs.List[ie].Value.GlobalRANNodeID)
-			gnb.SetGlobalRanNodeID(globalRANNodeID)
+			gnb.SetGlobalRanNodeID(models.GlobalRanNodeId{
+				PlmnId:  (*models.PlmnId)(globalRANNodeID.PlmnId),
+				N3IwfId: globalRANNodeID.N3IwfId,
+				GNbId:   (*models.GNbId)(globalRANNodeID.GNbId),
+				NgeNbId: globalRANNodeID.NgeNbId,
+			})
 		case ngapType.ProtocolIEIDRANNodeName:
 			gnb.SetRanNodename(req.ProtocolIEs.List[ie].Value.RANNodeName.Value)
 		case ngapType.ProtocolIEIDSupportedTAList:

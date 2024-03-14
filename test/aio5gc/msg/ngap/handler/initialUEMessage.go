@@ -9,9 +9,9 @@ import (
 	"my5G-RANTester/test/aio5gc/context"
 	"my5G-RANTester/test/aio5gc/msg/nas"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
 )
 
 func InitialUEMessage(req *ngapType.InitialUEMessage, gnb *context.GNBContext, fgc *context.Aio5gc) error {
@@ -34,11 +34,14 @@ func InitialUEMessage(req *ngapType.InitialUEMessage, gnb *context.GNBContext, f
 		case ngapType.ProtocolIEIDUserLocationInformation:
 			UserLocationInformationNR := req.ProtocolIEs.List[ie].Value.UserLocationInformation.UserLocationInformationNR
 			tai := ngapConvert.TaiToModels(UserLocationInformationNR.TAI)
-			nrLocation.Tai = &tai
+			nrLocation.Tai = &models.Tai{
+				PlmnId: (*models.PlmnId)(tai.PlmnId),
+				Tac:    tai.Tac,
+			}
 			ncgi := models.Ncgi{}
 			ncgi.NrCellId = ngapConvert.BitStringToHex(&UserLocationInformationNR.NRCGI.NRCellIdentity.Value)
 			plmn := ngapConvert.PlmnIdToModels(UserLocationInformationNR.NRCGI.PLMNIdentity)
-			ncgi.PlmnId = &plmn
+			ncgi.PlmnId = (*models.PlmnId)(&plmn)
 			nrLocation.Ncgi = &ncgi
 			nrLocation.GlobalGnbId = gnb.GetGlobalRanNodeID()
 

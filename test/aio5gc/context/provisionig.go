@@ -4,7 +4,7 @@
  */
 package context
 
-import "github.com/free5gc/openapi/models"
+import "github.com/BENHSU0723/openapi/models"
 
 type provisionedData struct {
 	defaultSNssai   models.Snssai

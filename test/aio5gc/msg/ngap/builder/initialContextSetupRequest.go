@@ -11,6 +11,7 @@ import (
 
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
+	freeModels "github.com/free5gc/openapi/models"
 )
 
 func InitialContextSetupRequest(nasPdu []byte, ue *context.UEContext, amf context.AMFContext) ([]byte, error) {
@@ -80,7 +81,7 @@ func buildInitialContextSetupRequest(nasPdu []byte, ue *context.UEContext, amf c
 
 	servedGuami := amf.GetServedGuami()[0]
 
-	*plmnID = ngapConvert.PlmnIdToNgap(*servedGuami.PlmnId)
+	*plmnID = ngapConvert.PlmnIdToNgap(freeModels.PlmnId(*servedGuami.PlmnId))
 	amfRegionID.Value, amfSetID.Value, amfPtrID.Value = ngapConvert.AmfIdToNgap(servedGuami.AmfId)
 
 	initialContextSetupRequestIEs.List = append(initialContextSetupRequestIEs.List, ie)
@@ -96,7 +97,7 @@ func buildInitialContextSetupRequest(nasPdu []byte, ue *context.UEContext, amf c
 	// Supporting only one plmn for now
 	for _, allowedSnssai := range amf.GetSupportedPlmnSnssai()[0].SNssaiList {
 		allowedNSSAIItem := ngapType.AllowedNSSAIItem{}
-		ngapSnssai := ngapConvert.SNssaiToNgap(allowedSnssai)
+		ngapSnssai := ngapConvert.SNssaiToNgap(freeModels.Snssai(allowedSnssai))
 		allowedNSSAIItem.SNSSAI = ngapSnssai
 		allowedNSSAI.List = append(allowedNSSAI.List, allowedNSSAIItem)
 	}

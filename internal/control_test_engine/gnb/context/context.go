@@ -12,7 +12,7 @@ import (
 	"github.com/free5gc/aper"
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
+	freeModels "github.com/free5gc/openapi/models"
 	"github.com/ishidawataru/sctp"
 	log "github.com/sirupsen/logrus"
 	gtpv1 "github.com/wmnsk/go-gtp/gtpv1"
@@ -402,7 +402,7 @@ func (gnb *GNBContext) GetSliceInBytes() ([]byte, []byte) {
 }
 
 func (gnb *GNBContext) GetPLMNIdentity() ngapType.PLMNIdentity {
-	return ngapConvert.PlmnIdToNgap(models.PlmnId{Mcc: gnb.controlInfo.mcc, Mnc: gnb.controlInfo.mnc})
+	return ngapConvert.PlmnIdToNgap(freeModels.PlmnId{Mcc: gnb.controlInfo.mcc, Mnc: gnb.controlInfo.mnc})
 }
 
 func (gnb *GNBContext) GetNRCellIdentity() ngapType.NRCellIdentity {

@@ -14,7 +14,7 @@ import (
 	"github.com/BENHSU0723/nas"
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func UlNasTransport(nasReq *nas.Message, gnb *context.GNBContext, ue *context.UEContext, session *context.SessionContext) error {
@@ -70,7 +70,8 @@ func transport5GSMMessage(ue *context.UEContext, ulNasTransport *nasMessage.ULNA
 	)
 	// If the S-NSSAI IE is not included, select a default snssai
 	if ulNasTransport.SNSSAI != nil {
-		snssai = nasConvert.SnssaiToModels(ulNasTransport.SNSSAI)
+		tmp := nasConvert.SnssaiToModels(ulNasTransport.SNSSAI)
+		snssai = models.Snssai(tmp)
 	} else {
 		snssai = ue.GetDefaultSNssai()
 	}

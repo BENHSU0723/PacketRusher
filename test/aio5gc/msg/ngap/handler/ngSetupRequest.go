@@ -10,6 +10,7 @@ import (
 	"my5G-RANTester/test/aio5gc/lib/types"
 	"my5G-RANTester/test/aio5gc/msg"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
 )
@@ -20,7 +21,12 @@ func NGSetupRequest(req *ngapType.NGSetupRequest, gnb *context.GNBContext, fgc *
 		switch req.ProtocolIEs.List[ie].Id.Value {
 		case ngapType.ProtocolIEIDGlobalRANNodeID:
 			globalRANNodeID := ngapConvert.RanIdToModels(*req.ProtocolIEs.List[ie].Value.GlobalRANNodeID)
-			gnb.SetGlobalRanNodeID(globalRANNodeID)
+			gnb.SetGlobalRanNodeID(models.GlobalRanNodeId{
+				PlmnId:  (*models.PlmnId)(globalRANNodeID.PlmnId),
+				N3IwfId: globalRANNodeID.N3IwfId,
+				GNbId:   (*models.GNbId)(globalRANNodeID.GNbId),
+				NgeNbId: globalRANNodeID.NgeNbId,
+			})
 		case ngapType.ProtocolIEIDRANNodeName:
 			gnb.SetRanNodename(req.ProtocolIEs.List[ie].Value.RANNodeName.Value)
 		case ngapType.ProtocolIEIDSupportedTAList:

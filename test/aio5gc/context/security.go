@@ -10,7 +10,7 @@ import (
 	"my5G-RANTester/internal/common/auth"
 
 	"github.com/BENHSU0723/nas/security"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/util/ueauth"
 	log "github.com/sirupsen/logrus"
 )

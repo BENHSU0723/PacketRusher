@@ -11,8 +11,8 @@ import (
 
 	"github.com/free5gc/ngap/ngapConvert"
 
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
 )
 
 func UplinkNASTransport(req *ngapType.UplinkNASTransport, gnb *context.GNBContext, fgc *context.Aio5gc) error {
@@ -43,14 +43,22 @@ func UplinkNASTransport(req *ngapType.UplinkNASTransport, gnb *context.GNBContex
 		case ngapType.ProtocolIEIDUserLocationInformation:
 			UserLocationInformationNR := req.ProtocolIEs.List[ie].Value.UserLocationInformation.UserLocationInformationNR
 			tai := ngapConvert.TaiToModels(UserLocationInformationNR.TAI)
-			nrLocation.Tai = &tai
+			newtai := models.Tai{
+				PlmnId: (*models.PlmnId)(tai.PlmnId),
+				Tac:    tai.Tac,
+			}
+			nrLocation.Tai = &newtai
 			ncgi := models.Ncgi{}
 			ncgi.NrCellId = ngapConvert.BitStringToHex(&UserLocationInformationNR.NRCGI.NRCellIdentity.Value)
 			plmn := ngapConvert.PlmnIdToModels(UserLocationInformationNR.NRCGI.PLMNIdentity)
-			ncgi.PlmnId = &plmn
+			ncgi.PlmnId = (*models.PlmnId)(&plmn)
 			nrLocation.Ncgi = &ncgi
-			nrLocation.GlobalGnbId = gnb.GetGlobalRanNodeID()
-
+			nrLocation.GlobalGnbId = &models.GlobalRanNodeId{
+				PlmnId:  (*models.PlmnId)(gnb.GetGlobalRanNodeID().PlmnId),
+				N3IwfId: gnb.GetGlobalRanNodeID().N3IwfId,
+				GNbId:   (*models.GNbId)(gnb.GetGlobalRanNodeID().GNbId),
+				NgeNbId: gnb.GetGlobalRanNodeID().NgeNbId,
+			}
 		case ngapType.ProtocolIEIDRRCEstablishmentCause:
 
 		case ngapType.ProtocolIEIDUEContextRequest:

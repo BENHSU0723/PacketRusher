@@ -9,12 +9,12 @@ import (
 
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
-	"github.com/free5gc/openapi/models"
+	free5gcModels "github.com/free5gc/openapi/models"
 )
 
 type Tai struct {
 	Tac            string
-	plmnSnssaiList []models.PlmnSnssai
+	plmnSnssaiList []free5gcModels.PlmnSnssai
 }
 
 func TaiListToModels(taiList ngapType.SupportedTAList) []Tai {
@@ -23,7 +23,7 @@ func TaiListToModels(taiList ngapType.SupportedTAList) []Tai {
 		taiModel := Tai{}
 		taiModel.Tac = hex.EncodeToString(taiList.List[i].TAC.Value)
 		for j := range taiList.List[i].BroadcastPLMNList.List {
-			plmnSnssai := models.PlmnSnssai{}
+			plmnSnssai := free5gcModels.PlmnSnssai{}
 			plmnid := ngapConvert.PlmnIdToModels(taiList.List[i].BroadcastPLMNList.List[j].PLMNIdentity)
 			plmnSnssai.PlmnId = &plmnid
 
