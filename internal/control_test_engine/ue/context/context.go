@@ -421,6 +421,9 @@ func (ue *UEContext) GetUeSecurityCapability() *nasType.UESecurityCapability {
 	return ue.UeSecurity.UeSecurityCapability
 }
 
+func (ue *UEContext) GetHplmn() (string, string) {
+	return ue.UeSecurity.mcc, ue.UeSecurity.mnc
+}
 func (ue *UEContext) GetMccAndMncInOctets() []byte {
 	var res string
 

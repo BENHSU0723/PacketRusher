@@ -13,6 +13,7 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/sender"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/trigger"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/BENHSU0723/nas"
@@ -300,9 +301,9 @@ func HandlerDlNasTransportPduaccept(ue *context.UEContext, message *nas.Message)
 		log.Warn("[UE][NAS] Receive DL NAS Transport, Payload Container Type is 5, UE Policy Container")
 		err := HandlerDlNasTransportUePolicyContainer(ue, message)
 		if err != nil {
-			log.Fatal("[UE][NAS] Occur error when decoding UE_Policy_Container: %+v", err)
+			log.Fatal("[UE][NAS] Occur error when decoding UE_Policy_Container: ", err.Error())
 		}
-		log.Warn("[UE][NAS] DL NAS Transport-UE Policy Container, finish the decoding preocedure without error !!")
+		log.Warn("[UE][NAS] DL NAS Transport-UE Policy Container, finish decoding preocedure successfully!!")
 		return
 	}
 
@@ -457,12 +458,10 @@ func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.
 
 	switch uePolContainer.GetHeaderMessageType() {
 	case uePolicyContainer.MsgTypeManageUEPolicyCommand:
-		uePolSecMngLsContent, err := DecodeMsgTypeManageUEPolicyCommand(uePolContainer)
+		err := HandleMsgTypeManageUEPolicyCommand(uePolContainer, ue)
 		if err != nil {
-			return fmt.Errorf("error of decoding [DecodeMsgTypeManageUEPolicyCommand]: %+v", err)
+			return fmt.Errorf("[UE][NAS] Error of decoding [DecodeMsgTypeManageUEPolicyCommand]: %+v", err)
 		}
-		log.Warnf("success of decoding [DecodeMsgTypeManageUEPolicyCommand], data:%+v", uePolSecMngLsContent)
-
 	case uePolicyContainer.MsgTypeManageUEPolicyComplete:
 		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeManageUEPolicyComplete] unhandle...")
 	case uePolicyContainer.MsgTypeManageUEPolicyReject:
@@ -484,11 +483,61 @@ func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.
 	return nil
 }
 
-func DecodeMsgTypeManageUEPolicyCommand(uePolContainer uePolicyContainer.UePolicyContainer) (uePolicyContainer.UEPolicySectionManagementListContent, error) {
+func HandleMsgTypeManageUEPolicyCommand(uePolContainer uePolicyContainer.UePolicyContainer, ue *context.UEContext) error {
 	var uePolSecMngLsContent uePolicyContainer.UEPolicySectionManagementListContent
-	uePolSecMngLsContent.UnmarshalBinary(uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent())
+	// decoding the byte content
+	log.Warnf("section mng list content: %x\n", uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent())
+	log.Warnf("section mng list content: %v\n", uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent())
+	if err := uePolSecMngLsContent.UnmarshalBinary(uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent()); err != nil {
+		log.Errorln("[UE][NAS] DL NAS Transport decode FAIL: ", err.Error())
+		return err
+	}
+	log.Warnf("[UE][NAS] DL NAS Transport decode Success, type: ManageUEPolicyCommand, data: %+v\n", uePolSecMngLsContent)
 
-	return nil, nil
+	for index, sublist := range uePolSecMngLsContent {
+		log.Infof("[UE][NAS] start Processing %d-th ue_policy_section_management_subslist...\n", index)
+		ueMcc, ueMnc := ue.GetHplmn()
+		if ueMcc != strconv.Itoa(*sublist.Mcc) || ueMnc != strconv.Itoa(*sublist.Mnc) {
+			// ue policy section management subslist (PLMN) does not fit the ue's PLMN
+			log.Errorf("[UE][NAS] Error IE,  PLMN of ue_policy_section_management_subslist is %d%d, but it should be %s%s\n", *sublist.Mcc, *sublist.Mnc, ueMcc, ueMnc)
+			continue
+		}
+
+		// Process the content
+		for _, instruc := range sublist.UEPolicySectionManagementSubListContents {
+			for _, uePolPart := range instruc.UEPolicySectionContents {
+				switch partType := uePolPart.UEPolicyPartType.GetPartType(); partType {
+				case uePolicyContainer.UEPolicyPartType_URSP:
+					if err := HandleUePolicyPartTypeURSP(uePolPart.GetPartContent()); err != nil {
+						log.Errorf("[UE][NAS] HandleUePolicyPartTypeURSP error: %+v", err)
+					}
+				case uePolicyContainer.UEPolicyPartType_ANDSP:
+					log.Warnf("[UE][NAS] Unhandle UE_Policy_Part_Type: [UEPolicyPartType_ANDSP(%v)]\n", partType)
+				case uePolicyContainer.UEPolicyPartType_V2XP:
+					log.Warnf("[UE][NAS] Unhandle UE_Policy_Part_Type: [UEPolicyPartType_V2XP(%v)]\n", partType)
+				case uePolicyContainer.UEPolicyPartType_ProSeP:
+					log.Warnf("[UE][NAS] Unhandle UE_Policy_Part_Type: [UEPolicyPartType_ProSeP(%v)]\n", partType)
+				default:
+					log.Errorf("[UE][NAS] Undefined UE_Policy_Part_Type: %+v\n", partType)
+				}
+			}
+		}
+
+	}
+	return nil
+}
+
+func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte) error {
+	var uePolicyURSP models.UePolicyURSP
+	if err := uePolicyURSP.DecodeURSP(uePolicyPartContents); err != nil {
+		return err
+	}
+
+	for index, urspRule := range uePolicyURSP.URSPruleSet {
+		log.Infof("[UE][URSP] start Processing %d-th URSP rule of UePolicyURSP...\n", index)
+		log.Warnf("[UE][URSP] URSP rule: %+v\n", urspRule)
+	}
+	return nil
 }
 
 func HandlerIdentityRequest(ue *context.UEContext, message *nas.Message) {

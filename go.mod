@@ -3,8 +3,8 @@ module my5G-RANTester
 go 1.21.3
 
 require (
-	github.com/BENHSU0723/nas v1.1.2-0.20240314051548-4246ae1acbaa
-	github.com/BENHSU0723/openapi v1.0.7-0.20240314084603-730620db0773
+	github.com/BENHSU0723/nas v1.1.2-0.20240319115314-3d37312fdd02
+	github.com/BENHSU0723/openapi v1.0.7-0.20240320065639-b10ef55d8cec
 	github.com/davecgh/go-spew v1.1.1
 	github.com/free5gc/aper v1.0.5
 	github.com/free5gc/go-gtp5gnl v1.4.6
@@ -20,7 +20,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/tetratelabs/wazero v1.6.0
-	github.com/urfave/cli/v2 v2.27.1
+	github.com/urfave/cli/v2 v2.25.5
 	github.com/vishvananda/netlink v1.1.0
 	github.com/wmnsk/go-gtp v0.8.9
 	golang.org/x/net v0.22.0
