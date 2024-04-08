@@ -7,6 +7,7 @@ package context
 import (
 	"encoding/hex"
 	"fmt"
+	"my5G-RANTester/config"
 	"sync"
 
 	"github.com/free5gc/aper"
@@ -25,7 +26,7 @@ type GNBContext struct {
 	prUePool       sync.Map    // map[in64]*GNBUe, PrUeId as key
 	amfPool        sync.Map    // map[int64]*GNBAmf, AmfId as key
 	teidPool       sync.Map    // map[uint32]*GNBUe, downlinkTeid as key
-	sliceInfo      Slice
+	sliceInfo      []Slice
 	idUeGenerator  int64  // ran UE id.
 	idAmfGenerator int64  // ran amf id
 	teidGenerator  uint32 // ran UE downlink Teid
@@ -57,14 +58,16 @@ type ControlInfo struct {
 	n2             *sctp.SCTPConn
 }
 
-func (gnb *GNBContext) NewRanGnbContext(gnbId, mcc, mnc, tac, sst, sd, ip, ipData string, port, portData int) {
+func (gnb *GNBContext) NewRanGnbContext(gnbId, mcc, mnc, tac string, snssaiList []config.SliceSupportItem, ip, ipData string, port, portData int) {
 	gnb.controlInfo.mcc = mcc
 	gnb.controlInfo.mnc = mnc
 	gnb.controlInfo.tac = tac
 	gnb.controlInfo.gnbId = gnbId
 	gnb.controlInfo.inboundChannel = make(chan UEMessage, 1)
-	gnb.sliceInfo.sd = sd
-	gnb.sliceInfo.sst = sst
+	gnb.sliceInfo = make([]Slice, len(snssaiList))
+	for _, snssai := range snssaiList {
+		gnb.sliceInfo = append(gnb.sliceInfo, Slice{snssai.Sd, snssai.Sst})
+	}
 	gnb.idUeGenerator = 1
 	gnb.idAmfGenerator = 1
 	gnb.controlInfo.gnbIp = ip
@@ -381,18 +384,22 @@ func (gnb *GNBContext) GetTacInBytes() []byte {
 	return resu
 }
 
-func (gnb *GNBContext) getSlice() (string, string) {
-	return gnb.sliceInfo.sst, gnb.sliceInfo.sd
+func (gnb *GNBContext) GetSliceListLength() int {
+	return len(gnb.sliceInfo)
 }
 
-func (gnb *GNBContext) GetSliceInBytes() ([]byte, []byte) {
-	sstBytes, err := hex.DecodeString(gnb.sliceInfo.sst)
+func (gnb *GNBContext) getSlice(index int) (string, string) {
+	return gnb.sliceInfo[index].sst, gnb.sliceInfo[index].sd
+}
+
+func (gnb *GNBContext) GetSliceInBytes(index int) ([]byte, []byte) {
+	sstBytes, err := hex.DecodeString(gnb.sliceInfo[index].sst)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	if gnb.sliceInfo.sd != "" {
-		sdBytes, err := hex.DecodeString(gnb.sliceInfo.sd)
+	if gnb.sliceInfo[index].sd != "" {
+		sdBytes, err := hex.DecodeString(gnb.sliceInfo[index].sd)
 		if err != nil {
 			fmt.Println(err)
 		}

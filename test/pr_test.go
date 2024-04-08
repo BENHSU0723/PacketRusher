@@ -111,7 +111,7 @@ func TestRegistrationToCtxReleaseWithPDUSession(t *testing.T) {
 		securityContext.SetAbba([]uint8{0x00, 0x00})
 
 		amfContext := fiveGC.GetAMFContext()
-		amfContext.Provision(models.Snssai{Sst: int32(ueSimCfg.Cfg.Ue.Snssai.Sst), Sd: ueSimCfg.Cfg.Ue.Snssai.Sd}, securityContext)
+		amfContext.Provision(models.Snssai{Sst: int32(ueSimCfg.Cfg.Ue.SnssaiList[0].Sst), Sd: ueSimCfg.Cfg.Ue.SnssaiList[0].Sd}, securityContext)
 
 		tools.SimulateSingleUE(ueSimCfg, &wg)
 
@@ -218,7 +218,7 @@ func TestUERegistrationLoop(t *testing.T) {
 		securityContext.SetAbba([]uint8{0x00, 0x00})
 
 		amfContext := fiveGC.GetAMFContext()
-		amfContext.Provision(models.Snssai{Sst: int32(ueSimCfg.Cfg.Ue.Snssai.Sst), Sd: ueSimCfg.Cfg.Ue.Snssai.Sd}, securityContext)
+		amfContext.Provision(models.Snssai{Sst: int32(ueSimCfg.Cfg.Ue.SnssaiList[0].Sst), Sd: ueSimCfg.Cfg.Ue.SnssaiList[0].Sd}, securityContext)
 
 		tools.SimulateSingleUE(ueSimCfg, &wg)
 

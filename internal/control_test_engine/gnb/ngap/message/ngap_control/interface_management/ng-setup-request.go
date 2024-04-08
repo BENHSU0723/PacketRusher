@@ -86,20 +86,22 @@ func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
 
 	sliceSupportList := &broadcastPLMNItem.TAISliceSupportList
 
-	// SliceSupportItem in SliceSupportList
-	sliceSupportItem := ngapType.SliceSupportItem{}
-	sst, sd := gnb.GetSliceInBytes()
+	sliceSupportListLen := gnb.GetSliceListLength()
+	for i := 0; i < sliceSupportListLen; i++ {
+		// SliceSupportItem in SliceSupportList
+		sliceSupportItem := ngapType.SliceSupportItem{}
+		sst, sd := gnb.GetSliceInBytes(i)
 
-	// sliceSupportItem.SNSSAI.SST.Value = aper.OctetString("\x01")
-	sliceSupportItem.SNSSAI.SST.Value = sst
+		// sliceSupportItem.SNSSAI.SST.Value = aper.OctetString("\x01")
+		sliceSupportItem.SNSSAI.SST.Value = sst
 
-	// sliceSupportItem.SNSSAI.SD.Value = aper.OctetString("\x01\x02\x03")
-	if sd != nil {
-		sliceSupportItem.SNSSAI.SD = new(ngapType.SD)
-		sliceSupportItem.SNSSAI.SD.Value = sd
+		// sliceSupportItem.SNSSAI.SD.Value = aper.OctetString("\x01\x02\x03")
+		if sd != nil {
+			sliceSupportItem.SNSSAI.SD = new(ngapType.SD)
+			sliceSupportItem.SNSSAI.SD.Value = sd
+		}
+		sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
 	}
-
-	sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
 
 	broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
 

@@ -58,7 +58,7 @@ type UEContext struct {
 
 	// TODO: Modify config so you can configure these parameters per PDUSession
 	Dnn        string
-	Snssai     models.Snssai
+	SnssaiList []models.Snssai
 	TunnelMode config.TunnelMode
 
 	// Sync primitive
@@ -113,7 +113,7 @@ type SECURITY struct {
 func (ue *UEContext) NewRanUeContext(msin string,
 	ueSecurityCapability *nasType.UESecurityCapability,
 	k, opc, op, amf, sqn, mcc, mnc, routingIndicator, dnn string,
-	sst int32, sd string, tunnelMode config.TunnelMode, scenarioChan chan scenario.ScenarioMessage,
+	snssaiList []config.Snssai, sessions []config.SessionConfig, tunnelMode config.TunnelMode, scenarioChan chan scenario.ScenarioMessage,
 	gnbInboundChannel chan context.UEMessage, id int) {
 
 	// added SUPI.
@@ -154,8 +154,19 @@ func (ue *UEContext) NewRanUeContext(msin string,
 	ue.prUeId = int64(id)
 
 	// added network slice
-	ue.Snssai.Sd = sd
-	ue.Snssai.Sst = sst
+	ue.SnssaiList = make([]models.Snssai, len(snssaiList))
+	for _, snssai := range snssaiList {
+		newSnssai := models.Snssai{
+			Sst: int32(snssai.Sst),
+			Sd:  snssai.Sd,
+		}
+		ue.SnssaiList = append(ue.SnssaiList, newSnssai)
+	}
+
+	// // add intial create PDU session info
+	// for idx, sessionInfo := range sessions {
+	// 	ue.InitPduSession[idx] = &sessionInfo
+	// }
 
 	// added Domain Network Name.
 	ue.Dnn = dnn

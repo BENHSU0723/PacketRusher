@@ -38,10 +38,10 @@ type Config struct {
 }
 
 type GNodeB struct {
-	ControlIF        ControlIF        `yaml:"controlif"`
-	DataIF           DataIF           `yaml:"dataif"`
-	PlmnList         PlmnList         `yaml:"plmnlist"`
-	SliceSupportList SliceSupportList `yaml:"slicesupportlist"`
+	ControlIF        ControlIF          `yaml:"controlif"`
+	DataIF           DataIF             `yaml:"dataif"`
+	PlmnList         PlmnList           `yaml:"plmnlist"`
+	SliceSupportList []SliceSupportItem `yaml:"slicesupportlist"`
 }
 
 type ControlIF struct {
@@ -58,24 +58,32 @@ type PlmnList struct {
 	Tac   string `yaml:"tac"`
 	GnbId string `yaml:"gnbid"`
 }
-type SliceSupportList struct {
+
+type SliceSupportItem struct {
 	Sst string `yaml:"sst"`
 	Sd  string `yaml:"sd"`
 }
 
+type SessionConfig struct {
+	PduType string `yaml:"pduType"`
+	Apn     string `yaml:"apn"`
+	Slice   Snssai `yaml:"slice"`
+}
+
 type Ue struct {
-	Msin             string     `yaml:"msin"`
-	Key              string     `yaml:"key"`
-	Opc              string     `yaml:"opc"`
-	Amf              string     `yaml:"amf"`
-	Sqn              string     `yaml:"sqn"`
-	Dnn              string     `yaml:"dnn"`
-	RoutingIndicator string     `yaml:"routingindicator"`
-	Hplmn            Hplmn      `yaml:"hplmn"`
-	Snssai           Snssai     `yaml:"snssai"`
-	Integrity        Integrity  `yaml:"integrity"`
-	Ciphering        Ciphering  `yaml:"ciphering"`
-	TunnelMode       TunnelMode `yaml:"-"`
+	Msin             string          `yaml:"msin"`
+	Key              string          `yaml:"key"`
+	Opc              string          `yaml:"opc"`
+	Amf              string          `yaml:"amf"`
+	Sqn              string          `yaml:"sqn"`
+	Dnn              string          `yaml:"dnn"`
+	RoutingIndicator string          `yaml:"routingindicator"`
+	Hplmn            Hplmn           `yaml:"hplmn"`
+	SnssaiList       []Snssai        `yaml:"snssailist"`
+	Sessions         []SessionConfig `yaml:"sessions"`
+	Integrity        Integrity       `yaml:"integrity"`
+	Ciphering        Ciphering       `yaml:"ciphering"`
+	TunnelMode       TunnelMode      `yaml:"-"`
 }
 
 type Hplmn struct {

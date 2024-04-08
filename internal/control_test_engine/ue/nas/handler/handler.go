@@ -5,6 +5,8 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"math"
 	"my5G-RANTester/internal/control_test_engine/ue/context"
@@ -13,7 +15,9 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/sender"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/trigger"
 	"reflect"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/BENHSU0723/nas"
@@ -240,16 +244,33 @@ func HandlerRegistrationAccept(ue *context.UEContext, message *nas.Message) {
 
 	// use the slice allowed by the network
 	// in PDU session request
-	if ue.Snssai.Sst == 0 {
+	if len(ue.SnssaiList) == 0 {
 
 		// check the allowed NSSAI received from the 5GC
-		snssai := message.RegistrationAccept.AllowedNSSAI.GetSNSSAIValue()
+		snssaiList := message.RegistrationAccept.AllowedNSSAI.GetSNSSAIValue()
 
 		// update UE slice selected for PDU Session
-		ue.Snssai.Sst = int32(snssai[1])
-		ue.Snssai.Sd = fmt.Sprintf("0%x0%x0%x", snssai[2], snssai[3], snssai[4])
-
-		log.Warn("[UE][NAS] ALLOWED NSSAI: SST: ", ue.Snssai.Sst, " SD: ", ue.Snssai.Sd)
+		ue.SnssaiList = make([]models.Snssai, 0)
+		buf := bytes.NewBuffer(snssaiList)
+		for buf.Len() > 0 {
+			var snssaiLen int32
+			var snssai models.Snssai
+			if err := binary.Read(buf, binary.BigEndian, &snssaiLen); err != nil {
+				log.Fatal("[UE][SNSSAI] decode S-NSSAI length error")
+			}
+			switch snssaiLen {
+			case 1:
+				snssai.Sst = int32(buf.Bytes()[1])
+			case 4:
+				snssai.Sst = int32(buf.Bytes()[1])
+				snssai.Sd = fmt.Sprintf("0%x0%x0%x", buf.Bytes()[2], buf.Bytes()[3], buf.Bytes()[4])
+			default:
+				log.Errorf("[UE][SNSSAI] decode error, don't support the S-NSSAI length:%d\n", snssaiLen)
+			}
+			_ = buf.Next(int(snssaiLen))
+			ue.SnssaiList = append(ue.SnssaiList, snssai)
+		}
+		log.Warn("[UE][NAS] ALLOWED NSSAI: ", ue.SnssaiList)
 	}
 
 	log.Info("[UE][NAS] UE 5G GUTI: ", ue.Get5gGuti())
@@ -434,7 +455,7 @@ func HandlerDlNasTransportPduaccept(ue *context.UEContext, message *nas.Message)
 			go func() {
 				// Exponential backoff
 				time.Sleep(time.Duration(math.Pow(5, float64(pduSession.T3580Retries))) * time.Second)
-				trigger.InitPduSessionRequestInner(ue, pduSession)
+				trigger.InitPduSessionRequestInner(ue, pduSession, 0x01, nil, nil) // 0x01 means IPv4 type
 				pduSession.T3580Retries++
 			}()
 		} else {
@@ -508,7 +529,7 @@ func HandleMsgTypeManageUEPolicyCommand(uePolContainer uePolicyContainer.UePolic
 			for _, uePolPart := range instruc.UEPolicySectionContents {
 				switch partType := uePolPart.UEPolicyPartType.GetPartType(); partType {
 				case uePolicyContainer.UEPolicyPartType_URSP:
-					if err := HandleUePolicyPartTypeURSP(uePolPart.GetPartContent()); err != nil {
+					if err := HandleUePolicyPartTypeURSP(uePolPart.GetPartContent(), ue); err != nil {
 						log.Errorf("[UE][NAS] HandleUePolicyPartTypeURSP error: %+v", err)
 					}
 				case uePolicyContainer.UEPolicyPartType_ANDSP:
@@ -527,17 +548,144 @@ func HandleMsgTypeManageUEPolicyCommand(uePolContainer uePolicyContainer.UePolic
 	return nil
 }
 
-func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte) error {
+func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte, ue *context.UEContext) error {
 	var uePolicyURSP models.UePolicyURSP
+	// decode URSP first
 	if err := uePolicyURSP.DecodeURSP(uePolicyPartContents); err != nil {
 		return err
 	}
 
+	// sort the URSP rules by precedence value
+	precedences := make([]int, len(uePolicyURSP.URSPruleSet))
+	prece2URSPruleMap := map[int]models.URSPrule{}
 	for index, urspRule := range uePolicyURSP.URSPruleSet {
-		log.Infof("[UE][URSP] start Processing %d-th URSP rule of UePolicyURSP...\n", index)
-		log.Warnf("[UE][URSP] URSP rule: %+v\n", urspRule)
+		precedences[index] = int(urspRule.PrecedenceValue)
+		prece2URSPruleMap[int(urspRule.PrecedenceValue)] = urspRule
 	}
+	sort.Ints(precedences)
+	sortedURSP := models.UePolicyURSP{}
+	for i := 0; i < len(uePolicyURSP.URSPruleSet); i++ {
+		sortedURSP.URSPruleSet = append(sortedURSP.URSPruleSet, prece2URSPruleMap[precedences[i]])
+	}
+
+	// apply the URSP rules one by one to route traffic flow
+	for index, urspRule := range sortedURSP.URSPruleSet {
+		log.Infof("[UE][URSP] Start Processing %d-th URSP rule of UePolicyURSP...\n", index)
+		log.Warnf("[UE][URSP] URSP rule: %+v\n", urspRule)
+		for _, routeDesc := range urspRule.RouteSelectionDescriptorList {
+			capablePduAttri := []models.RouteSelectionComponent{}
+			for _, routeComp := range routeDesc.RouteSelectionContent {
+				switch id := routeComp.Identifier; id {
+				case models.Route_S_NSSAI_type:
+					capablePduAttri = append(capablePduAttri, routeComp)
+				case models.Route_DNN_type:
+					capablePduAttri = append(capablePduAttri, routeComp)
+				case models.Route_PDU_session_type_type:
+					capablePduAttri = append(capablePduAttri, routeComp)
+
+				default:
+					log.Warnf("[URSP][RouteSelectionComponent] UE can not apply this attribution of id:%v,value:%v  on PDU session!! \n", id, routeComp.Value)
+				}
+			}
+
+			// Check a single RouteSelectionDescriptor is capable to existed PDU session, then go to apply routing rule. If return false, make a PDU session first.
+			exist, pduId := matchExistedPDU(ue, capablePduAttri)
+			if exist {
+				log.Warnf("[URSP][RouteSelectionComponent] match all RouteSelectionComponent with existed PDU session id:%v\n", pduId)
+			} else {
+				createPDUsessionByURSP(ue, capablePduAttri)
+				log.Warnf("Invoke createPDUsessionByURSP...")
+			}
+		}
+
+		// for _,traffDes:=range urspRule.TrafficDescriptor{
+		// 	switch traffDes.Identifier{
+		// 	case models.Traf_IPv4_remote_addr_type:
+
+		// 	}
+		// }
+	}
+
 	return nil
+}
+
+func createPDUsessionByURSP(ue *context.UEContext, capablePduAttri []models.RouteSelectionComponent) {
+	var slice models.Snssai
+	var dnn string
+	var pduType uint8
+	for _, routeComp := range capablePduAttri {
+		switch id := routeComp.Identifier; id {
+		case models.Route_S_NSSAI_type:
+			slice.Sst = int32(routeComp.Value[3])
+			slice.Sd = string(routeComp.Value[4:7])
+		case models.Route_DNN_type:
+			dnn = string(routeComp.Value[1:]) // routeComp.Value[0] is length
+		case models.Route_PDU_session_type_type:
+			pduType = routeComp.Value[0]
+		}
+	}
+	trigger.InitPduSessionRequest(ue, pduType, &slice, &dnn)
+}
+
+// check whether at least one existed PDU session match all RouteSelectionComponents, if ture return the pdu session ID
+func matchExistedPDU(ue *context.UEContext, routeSelComponents []models.RouteSelectionComponent) (rsp bool, pduId uint8) {
+	for _, uePDU := range ue.PduSession {
+		for index, routeComp := range routeSelComponents {
+			switch id := routeComp.Identifier; id {
+			case models.Route_S_NSSAI_type:
+				sst, sd := uePDU.GnbPduSession.GetSNSSAI()
+				if routeComp.Value[2] == 0x01 { //only sst
+					if sst != string(routeComp.Value[3:4]) {
+						break
+					}
+				} else if routeComp.Value[2] == 0x04 { //sst and sd
+					if sst != string(routeComp.Value[3:4]) && sd == string(routeComp.Value[4:7]) {
+						break
+					}
+				} else {
+					log.Errorln("[URSP][RouteSelectionComponent] SNSSAI type should be 0x01 or 0x04")
+					break
+				}
+			case models.Route_DNN_type:
+				routeDnn := string(routeComp.Value[1:]) // routeComp.Value[0] is length
+				if ue.Dnn != routeDnn {
+					break
+				}
+			case models.Route_PDU_session_type_type:
+				if strings.ToLower(resolvePDUsessType(routeComp.Value[0])) != strings.ToLower(uePDU.GnbPduSession.GetPduType()) {
+					break
+				}
+			default:
+				log.Warnf("[URSP][RouteSelectionComponent] ue does not handle match this type(attribution): %v\n", id)
+			}
+
+			// fit all route descriptor demand
+			if index == len(routeSelComponents)-1 {
+				return true, uePDU.Id
+			}
+		}
+	}
+	return false, 0x00
+}
+
+// ref to TS 124 501 V17.7.1, 9.11.4.11 PDU session type
+func resolvePDUsessType(value uint8) string {
+
+	if value == 0x01 {
+		return "ipv4"
+	} else if value == 0x02 {
+		return "ipv6"
+	} else if value == 0x03 {
+		return "ipv4ipv6"
+	} else if value == 0x04 {
+		return "unstructured"
+	} else if value == 0x05 {
+		return "ethernet"
+	} else if value == 0x07 {
+		return "reserved"
+	}
+	// All other values are unused and shall be interpreted as "IPv4v6", if received by the UE or the network.
+	return "ipv4ipv6"
 }
 
 func HandlerIdentityRequest(ue *context.UEContext, message *nas.Message) {

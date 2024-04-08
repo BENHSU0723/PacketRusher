@@ -60,6 +60,31 @@ func main() {
 				},
 			},
 			{
+				Name:    "uePDU",
+				Aliases: []string{"uePDU"},
+				Usage:   "Operate a PDU session of certain UE for Add/Modify/Delete\n",
+				Flags: []cli.Flag{
+					&cli.PathFlag{Name: "add", Aliases: []string{"a"}, Usage: "Add a new PDU session for this UE.", Value: "ueid ismi-0000000003 sst 01 sd 112233 dnn Internet"},
+					&cli.PathFlag{Name: "delete", Aliases: []string{"d"}, Usage: "Delete a existed PDU session for this UE", Value: "ueid ismi-0000000003 sst 01 sd 112233 dnn Internet"},
+					// &cli.PathFlag{Name: "modify", Aliases: []string{"m"}, Usage: "Modify a existed PDU session for this UE", Value: "./dump.pcap"},
+				},
+				Action: func(c *cli.Context) error {
+					name := "Testing an ue attached with configuration"
+					cfg := setConfig(*c)
+
+					log.Info("PacketRusher version " + version)
+					log.Info("---------------------------------------")
+					log.Info("[TESTER] Starting test function: ", name)
+					log.Info("[TESTER][UE] Number of UEs: ", 1)
+					log.Info("[TESTER][GNB] Control interface IP/Port: ", cfg.GNodeB.ControlIF.Ip, "/", cfg.GNodeB.ControlIF.Port)
+					log.Info("[TESTER][GNB] Data interface IP/Port: ", cfg.GNodeB.DataIF.Ip, "/", cfg.GNodeB.DataIF.Port)
+					log.Info("[TESTER][AMF] AMF IP/Port: ", cfg.AMF.Ip, "/", cfg.AMF.Port)
+					log.Info("---------------------------------------")
+
+					return nil
+				},
+			},
+			{
 				Name:    "gnb",
 				Aliases: []string{"gnb"},
 				Usage:   "Launch only a gNB",

@@ -19,9 +19,11 @@ func GenerateDefaultConf(controlIF config.ControlIF, dataIF config.DataIF, amf c
 				Tac:   "000001",
 				GnbId: "000008",
 			},
-			SliceSupportList: config.SliceSupportList{
-				Sst: "01",
-				Sd:  "000001",
+			SliceSupportList: []config.SliceSupportItem{
+				{
+					Sst: "01",
+					Sd:  "000001",
+				},
 			},
 		},
 		Ue: config.Ue{
@@ -36,9 +38,11 @@ func GenerateDefaultConf(controlIF config.ControlIF, dataIF config.DataIF, amf c
 				Mcc: "999",
 				Mnc: "70",
 			},
-			Snssai: config.Snssai{
-				Sst: 01,
-				Sd:  "000001",
+			SnssaiList: []config.Snssai{
+				{
+					Sst: 01,
+					Sd:  "000001",
+				},
 			},
 			Integrity: config.Integrity{
 				Nia0: false,
