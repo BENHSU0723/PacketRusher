@@ -7,6 +7,7 @@ package handler
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"my5G-RANTester/internal/control_test_engine/ue/context"
@@ -582,7 +583,6 @@ func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte, ue *context.UEConte
 					capablePduAttri = append(capablePduAttri, routeComp)
 				case models.Route_PDU_session_type_type:
 					capablePduAttri = append(capablePduAttri, routeComp)
-
 				default:
 					log.Warnf("[URSP][RouteSelectionComponent] UE can not apply this attribution of id:%v,value:%v  on PDU session!! \n", id, routeComp.Value)
 				}
@@ -612,48 +612,59 @@ func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte, ue *context.UEConte
 func createPDUsessionByURSP(ue *context.UEContext, capablePduAttri []models.RouteSelectionComponent) {
 	var slice models.Snssai
 	var dnn string
-	var pduType uint8
+	var pduType uint8 = 0x01 //default create IPv4 type PDU session
 	for _, routeComp := range capablePduAttri {
 		switch id := routeComp.Identifier; id {
 		case models.Route_S_NSSAI_type:
-			slice.Sst = int32(routeComp.Value[3])
-			slice.Sd = string(routeComp.Value[4:7])
+			buf := bytes.NewBuffer(routeComp.Value[3:4])
+			var tmp int8
+			binary.Read(buf, binary.BigEndian, &tmp)
+			slice.Sst = int32(tmp)
+			slice.Sd = hex.EncodeToString(routeComp.Value[4:7])
 		case models.Route_DNN_type:
 			dnn = string(routeComp.Value[1:]) // routeComp.Value[0] is length
 		case models.Route_PDU_session_type_type:
+			log.Warnln("dnn(routeComp.Value): ", routeComp.Value)
 			pduType = routeComp.Value[0]
 		}
 	}
-	trigger.InitPduSessionRequest(ue, pduType, &slice, &dnn)
+	// TODO: add this IE[pduType] in UE policy container
+	log.Warnf("InitPduSessionRequest: pduType[%v], dnn[%v], slice[%v]\n", pduType, dnn, slice)
+	go func() {
+		for i := 0; i < 10; i++ {
+			log.Warnf("Waiting %d-th seconds for create extra PDU session for URSP rule...\n", i)
+			time.Sleep(1 * time.Second)
+		}
+		trigger.InitPduSessionRequest(ue, pduType, &slice, &dnn)
+	}()
 }
 
 // check whether at least one existed PDU session match all RouteSelectionComponents, if ture return the pdu session ID
-func matchExistedPDU(ue *context.UEContext, routeSelComponents []models.RouteSelectionComponent) (rsp bool, pduId uint8) {
-	for _, uePDU := range ue.PduSession {
+func matchExistedPDU(ue *context.UEContext, routeSelComponents []models.RouteSelectionComponent) (rsp bool, pduId int) {
+	for pduId, uePDU := range ue.PduSession {
+		if uePDU == nil || uePDU.GnbPduSession == nil {
+			continue
+		}
+		log.Warnln("Starting Compare Existed PDU session of ue , id:", pduId)
+	nextPDU:
 		for index, routeComp := range routeSelComponents {
 			switch id := routeComp.Identifier; id {
 			case models.Route_S_NSSAI_type:
 				sst, sd := uePDU.GnbPduSession.GetSNSSAI()
-				if routeComp.Value[2] == 0x01 { //only sst
-					if sst != string(routeComp.Value[3:4]) {
-						break
-					}
-				} else if routeComp.Value[2] == 0x04 { //sst and sd
-					if sst != string(routeComp.Value[3:4]) && sd == string(routeComp.Value[4:7]) {
-						break
-					}
-				} else {
-					log.Errorln("[URSP][RouteSelectionComponent] SNSSAI type should be 0x01 or 0x04")
-					break
+				if !compareSliceInfo(routeComp.Value, sst, sd) {
+					log.Warnln("Slice info is not equal")
+					break nextPDU
 				}
 			case models.Route_DNN_type:
 				routeDnn := string(routeComp.Value[1:]) // routeComp.Value[0] is length
-				if ue.Dnn != routeDnn {
-					break
+				if !strings.EqualFold(ue.Dnn, routeDnn) {
+					log.Warnf("DNN is not equal: ueDnn[%v], routeDnn[%v]\n", ue.Dnn, routeDnn)
+					break nextPDU
 				}
 			case models.Route_PDU_session_type_type:
-				if strings.ToLower(resolvePDUsessType(routeComp.Value[0])) != strings.ToLower(uePDU.GnbPduSession.GetPduType()) {
-					break
+				if !strings.EqualFold(resolvePDUsessType(routeComp.Value[0]), uePDU.GnbPduSession.GetPduType()) {
+					log.Warnf("PDU session Type is not equal: ueDnn[%v], routeDnn[%v]\n", uePDU.GnbPduSession.GetPduType(), resolvePDUsessType(routeComp.Value[0]))
+					break nextPDU
 				}
 			default:
 				log.Warnf("[URSP][RouteSelectionComponent] ue does not handle match this type(attribution): %v\n", id)
@@ -661,11 +672,45 @@ func matchExistedPDU(ue *context.UEContext, routeSelComponents []models.RouteSel
 
 			// fit all route descriptor demand
 			if index == len(routeSelComponents)-1 {
-				return true, uePDU.Id
+				return true, pduId
 			}
 		}
 	}
 	return false, 0x00
+}
+
+func compareSliceInfo(sliceValue []uint8, ueSst, ueSd string) bool {
+	log.Warnf("[URSP][RouteSelectionComponent] slice info of UE PDU session is sst:%v,sd:%v\n", ueSst, ueSd)
+
+	// decode sst
+	var sstRoute int8
+	buf := bytes.NewBuffer(sliceValue[3:4])
+	if err := binary.Read(buf, binary.BigEndian, &sstRoute); err != nil {
+		log.Errorf("[URSP][RouteSelectionComponent] inlegal slice sst:%v\n", sliceValue[3:4])
+		return false
+	}
+	ueSst_int, err := strconv.Atoi(ueSst)
+	if err != nil {
+		return false
+	}
+
+	if sliceValue[2] == 0x01 { //only sst
+		log.Warnf("[URSP][RouteSelectionComponent] slice info of VN Group Config is sst:%v\n", sstRoute)
+		if int8(ueSst_int) != sstRoute {
+			return false
+		}
+	} else if sliceValue[2] == 0x04 { //sst and sd
+		// decode sd
+		sdRoute := hex.EncodeToString(sliceValue[4:7])
+		log.Warnf("[URSP][RouteSelectionComponent] slice info of VN Group Config is sst:%v,sd:%v\n", sstRoute, sdRoute)
+		if int8(ueSst_int) != sstRoute || ueSd != sdRoute {
+			return false
+		}
+	} else {
+		log.Errorln("[URSP][RouteSelectionComponent] only support SNSSAI type  0x01 or 0x04")
+		return false
+	}
+	return true
 }
 
 // ref to TS 124 501 V17.7.1, 9.11.4.11 PDU session type

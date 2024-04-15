@@ -64,7 +64,6 @@ func (gnb *GNBContext) NewRanGnbContext(gnbId, mcc, mnc, tac string, snssaiList 
 	gnb.controlInfo.tac = tac
 	gnb.controlInfo.gnbId = gnbId
 	gnb.controlInfo.inboundChannel = make(chan UEMessage, 1)
-	gnb.sliceInfo = make([]Slice, len(snssaiList))
 	for _, snssai := range snssaiList {
 		gnb.sliceInfo = append(gnb.sliceInfo, Slice{snssai.Sd, snssai.Sst})
 	}

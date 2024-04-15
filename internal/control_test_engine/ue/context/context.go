@@ -154,7 +154,6 @@ func (ue *UEContext) NewRanUeContext(msin string,
 	ue.prUeId = int64(id)
 
 	// added network slice
-	ue.SnssaiList = make([]models.Snssai, len(snssaiList))
 	for _, snssai := range snssaiList {
 		newSnssai := models.Snssai{
 			Sst: int32(snssai.Sst),

@@ -17,11 +17,13 @@ import (
 	"github.com/BENHSU0723/nas/nasType"
 
 	"github.com/BENHSU0723/openapi/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func Request_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UEContext, pduType uint8, slice *models.Snssai, dnn *string) ([]byte, error) {
 	var pdu []byte
 	if slice != nil && dnn != nil {
+		log.Warnf("InitPduSessionRequest: pduType[%v], dnn[%v], slice[%v]\n", pduType, *dnn, *slice)
 		pdu = getUlNasTransport_PduSessionEstablishmentRequest(pduSession.Id, *dnn, slice, pduType)
 	} else {
 		pdu = getUlNasTransport_PduSessionEstablishmentRequest(pduSession.Id, ue.Dnn, &ue.SnssaiList[0], pduType)

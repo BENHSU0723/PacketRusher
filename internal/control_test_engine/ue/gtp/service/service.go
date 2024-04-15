@@ -22,8 +22,16 @@ import (
 )
 
 func SetupGtpInterface(ue *context.UEContext, msg gnbContext.UEMessage) {
+	log.Warnln("msg.GnbIp:", msg.GnbIp)
 	gnbPduSession := msg.GNBPduSessions[0]
+	log.Warnf("msg.GNBPduSessions:%+v\n", msg.GNBPduSessions)
 	pduSession, err := ue.GetPduSession(uint8(gnbPduSession.GetPduSessionId()))
+	if pduSession != nil && (*pduSession).Id != 1 { //if it is not first PDU session, just create interface taher than vrf
+		ue.TunnelMode = config.TunnelTun
+	}
+	log.Warnf("get ue PDU session:%+v\n", pduSession)
+	log.Warnf("all UE PDU session: %+v\n", ue.PduSession)
+	log.Warnf("ue context:%+v\n", ue)
 	if pduSession == nil || err != nil {
 		log.Error("[GNB][GTP] Aborting the setup of PDU Session ", gnbPduSession.GetPduSessionId(), ", this PDU session was not succesfully configured on the UE's side.")
 		return
@@ -35,10 +43,10 @@ func SetupGtpInterface(ue *context.UEContext, msg gnbContext.UEMessage) {
 		return
 	}
 
-	if pduSession.Id != 1 {
-		log.Warn("[GNB][GTP] Only one tunnel per UE is supported for now, no tunnel will be created for second PDU Session of given UE")
-		return
-	}
+	// if pduSession.Id != 1 {
+	// 	log.Warn("[GNB][GTP] Only one tunnel per UE is supported for now, no tunnel will be created for second PDU Session of given UE")
+	// 	return
+	// }
 
 	// get UE GNB IP.
 	pduSession.SetGnbIp(net.ParseIP(msg.GnbIp))
@@ -48,6 +56,8 @@ func SetupGtpInterface(ue *context.UEContext, msg gnbContext.UEMessage) {
 	ueIp := pduSession.GetIp()
 	msin := ue.GetMsin()
 	nameInf := fmt.Sprintf("val%s", msin)
+	// nameInf := "val" + strings.Replace(ueIp, ".", "", -1)
+	// log.Warnln("test string replace:", strings.Replace(ueIp, ".", "", -1))
 	vrfInf := fmt.Sprintf("vrf%s", msin)
 	stopSignal := make(chan bool)
 
@@ -58,14 +68,19 @@ func SetupGtpInterface(ue *context.UEContext, msg gnbContext.UEMessage) {
 		time.Sleep(time.Second)
 	}
 
-	go func() {
-		// This function should not return as long as the GTP-U UDP socket is open
-		if err := gtpLink.CmdAdd(nameInf, 1, ueGnbIp.String(), stopSignal); err != nil {
-			log.Fatal("[GNB][GTP] Unable to create Kernel GTP interface: ", err, msin, nameInf)
-			return
-		}
-	}()
-
+	log.Warnln("ueGnbIp.String():", ueGnbIp.String())
+	log.Warnln("ueIp:", ueIp)
+	log.Warnln("nameInf:", nameInf)
+	if pduSession != nil && (*pduSession).Id == 1 {
+		go func() {
+			// This function should not return as long as the GTP-U UDP socket is open
+			if err := gtpLink.CmdAdd(nameInf, 1, ueGnbIp.String(), stopSignal); err != nil {
+				log.Fatal("[GNB][GTP] Unable to create Kernel GTP interface: ", err, msin, nameInf)
+				return
+			}
+		}()
+	}
+	log.Warnln("add a new interface success:", nameInf)
 	pduSession.SetStopSignal(stopSignal)
 
 	time.Sleep(time.Second)

@@ -29,10 +29,10 @@ ue:
     mnc: "93"
   snssailist:
     - sst: 01
-      sd: "010203" # optional, can be removed if not used
+      sd: "010203" # default PDU session session used
     - sst: 01
       sd: "112233"
-  sessions:
+  sessions:     # currently no used
     - pduType: 'IPv4'
       apn: 'internet'
       slice:

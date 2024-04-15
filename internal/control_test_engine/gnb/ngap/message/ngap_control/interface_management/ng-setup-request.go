@@ -12,6 +12,7 @@ import (
 	"github.com/free5gc/aper"
 
 	"github.com/free5gc/ngap/ngapType"
+	log "github.com/sirupsen/logrus"
 )
 
 func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
@@ -85,8 +86,10 @@ func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
 	broadcastPLMNItem.PLMNIdentity.Value = gnb.GetMccAndMncInOctets()
 
 	sliceSupportList := &broadcastPLMNItem.TAISliceSupportList
+	log.Warnf("broadcastPLMNItem.TAISliceSupportList:%+v\n", broadcastPLMNItem.TAISliceSupportList)
 
 	sliceSupportListLen := gnb.GetSliceListLength()
+	log.Warnf("sliceSupportListLen:%+v\n", sliceSupportListLen)
 	for i := 0; i < sliceSupportListLen; i++ {
 		// SliceSupportItem in SliceSupportList
 		sliceSupportItem := ngapType.SliceSupportItem{}
@@ -102,6 +105,7 @@ func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
 		}
 		sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
 	}
+	log.Warnf("sliceSupportList.List :%+v\n", sliceSupportList.List)
 
 	broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
 
