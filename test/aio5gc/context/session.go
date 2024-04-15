@@ -11,7 +11,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 type SessionContext struct {

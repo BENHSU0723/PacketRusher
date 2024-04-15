@@ -4,7 +4,7 @@ import (
 	"my5G-RANTester/lib/aper"
 	"my5G-RANTester/lib/ngap/ngapType"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 // TS 38.413 9.3.1.85

@@ -14,7 +14,7 @@ import (
 	"github.com/BENHSU0723/nas"
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func UlNasTransport(nasReq *nas.Message, gnb *context.GNBContext, ue *context.UEContext, session *context.SessionContext) error {

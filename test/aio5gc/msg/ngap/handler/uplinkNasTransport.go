@@ -11,7 +11,7 @@ import (
 	"my5G-RANTester/test/aio5gc/context"
 	"my5G-RANTester/test/aio5gc/msg/nas"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func UplinkNASTransport(req *ngapType.UplinkNASTransport, gnb *context.GNBContext, fgc *context.Aio5gc) error {

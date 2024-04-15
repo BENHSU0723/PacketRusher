@@ -8,7 +8,7 @@ import (
 	"my5G-RANTester/lib/ngap/ngapConvert"
 	"my5G-RANTester/lib/ngap/ngapType"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func NRLocationToModels(location *ngapType.UserLocationInformationNR) *models.NrLocation {

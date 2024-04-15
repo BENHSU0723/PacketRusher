@@ -24,7 +24,7 @@ import (
 
 	"my5G-RANTester/internal/common/auth"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	log "github.com/sirupsen/logrus"
 	"github.com/vishvananda/netlink"
 )

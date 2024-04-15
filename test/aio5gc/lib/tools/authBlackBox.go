@@ -12,7 +12,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/free5gc/util/milenage"
 	"github.com/free5gc/util/ueauth"
 	log "github.com/sirupsen/logrus"

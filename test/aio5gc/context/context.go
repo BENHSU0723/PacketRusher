@@ -11,7 +11,7 @@ import (
 	"strconv"
 
 	"github.com/BENHSU0723/nas"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 // All in one 5GC for test purpose

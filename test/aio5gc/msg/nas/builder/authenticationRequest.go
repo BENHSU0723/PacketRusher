@@ -15,7 +15,7 @@ import (
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/BENHSU0723/nas/nasType"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/mitchellh/mapstructure"
 )
 

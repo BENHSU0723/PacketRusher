@@ -10,7 +10,7 @@ import (
 
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 	"github.com/mohae/deepcopy"
 	log "github.com/sirupsen/logrus"
 )

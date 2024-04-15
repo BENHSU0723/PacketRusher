@@ -14,7 +14,7 @@ import (
 	"my5G-RANTester/test/aio5gc/context"
 	"net"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func PDUSessionResourceSetup(nasPdu []byte, smContext context.SmContext, ue *context.UEContext, session *context.SessionContext) ([]byte, error) {

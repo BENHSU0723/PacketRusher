@@ -6,7 +6,7 @@ import (
 	"my5G-RANTester/lib/ngap/ngapType"
 	"strings"
 
-	"github.com/free5gc/openapi/models"
+	"github.com/BENHSU0723/openapi/models"
 )
 
 func TraceDataToModels(traceActivation ngapType.TraceActivation) (traceData models.TraceData) {
