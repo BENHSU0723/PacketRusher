@@ -14,7 +14,7 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control/mm_5gs"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/sender"
 
-	"github.com/free5gc/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasMessage"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,7 +50,7 @@ func InitPduSessionRequest(ue *context.UEContext) {
 
 func InitPduSessionRequestInner(ue *context.UEContext, pduSession *context.UEPDUSession) {
 	log.Info("[UE] Initiating New PDU Session")
-
+	log.Warn("[UE][PDU] PDU session ID:", *&pduSession.Id)
 	ulNasTransport, err := mm_5gs.Request_UlNasTransport(pduSession, ue)
 	if err != nil {
 		log.Fatal("[UE][NAS] Error sending ul nas transport and pdu session establishment request: ", err)

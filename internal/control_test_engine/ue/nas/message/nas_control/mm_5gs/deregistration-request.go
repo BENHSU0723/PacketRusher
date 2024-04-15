@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"my5G-RANTester/internal/control_test_engine/ue/context"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
 )
 
 func GetDeregistrationRequest(ue *context.UEContext) (nasPdu []byte) {

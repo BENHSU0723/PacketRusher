@@ -15,11 +15,10 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
 	log "github.com/sirupsen/logrus"
 )
-
 
 func HandlerAuthenticationReject(ue *context.UEContext, message *nas.Message) {
 
@@ -109,7 +108,7 @@ func HandlerAuthenticationRequest(ue *context.UEContext, message *nas.Message) {
 	sender.SendToGnb(ue, authenticationResponse)
 }
 
-func HandlerSecurityModeCommand(ue *context.UEContext, message *nas.Message) {	// check the mandatory fields
+func HandlerSecurityModeCommand(ue *context.UEContext, message *nas.Message) { // check the mandatory fields
 	if reflect.ValueOf(message.SecurityModeCommand.ExtendedProtocolDiscriminator).IsZero() {
 		log.Fatal("[UE][NAS] Error in Security Mode Command, Extended Protocol is missing")
 	}
@@ -149,7 +148,7 @@ func HandlerSecurityModeCommand(ue *context.UEContext, message *nas.Message) {	/
 	if reflect.ValueOf(message.SecurityModeCommand.ReplayedUESecurityCapabilities).IsZero() {
 		log.Fatal("[UE][NAS] Error in Security Mode Command, Replayed UE Security Capabilities is missing")
 	}
-	
+
 	ue.UeSecurity.CipheringAlg = message.SecurityModeCommand.SelectedNASSecurityAlgorithms.GetTypeOfCipheringAlgorithm()
 	switch ue.UeSecurity.CipheringAlg {
 	case 0:
@@ -451,12 +450,11 @@ func HandlerIdentityRequest(ue *context.UEContext, message *nas.Message) {
 		log.Fatal("[UE][NAS] Error in Identity Request, Spare Half Octet And Identity Type is missing")
 	}
 
-
 	switch message.IdentityRequest.GetTypeOfIdentity() {
-		case 1:
-			log.Info("[UE][NAS] Requested SUCI 5GS type")
-		default:
-			log.Fatal("[UE][NAS] Only SUCI identity is supported for now inside PacketRusher")
+	case 1:
+		log.Info("[UE][NAS] Requested SUCI 5GS type")
+	default:
+		log.Fatal("[UE][NAS] Only SUCI identity is supported for now inside PacketRusher")
 	}
 
 	trigger.InitIdentifyResponse(ue)

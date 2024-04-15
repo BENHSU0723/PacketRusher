@@ -10,7 +10,7 @@ import (
 	"my5G-RANTester/lib/ngap/ngapType"
 	"strconv"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	"github.com/free5gc/openapi/models"
 )
 

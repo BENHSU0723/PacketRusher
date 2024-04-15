@@ -1,3 +1,5 @@
+github.com/BENHSU0723/nas v1.1.2-0.20240319115314-3d37312fdd02 h1:ZRtMy5cIx0BMMYlEUIh178R5uu1V843kAkKhQoUj+4g=
+github.com/BENHSU0723/nas v1.1.2-0.20240319115314-3d37312fdd02/go.mod h1:KdDbh8IjZhQqMa2SuqLPNrS3fmCQDTOeZE8/XpLOaw0=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/RoaringBitmap/roaring v1.3.0 h1:aQmu9zQxDU0uhwR8SXOH/OrqEf+X8A0LQmwW3JX8Lcg=
@@ -18,10 +20,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/frankban/quicktest v1.14.5 h1:dfYrrRyLtiqT9GyKXgdh+k4inNeTvmGbuSgZ3lx3GhA=
 github.com/frankban/quicktest v1.14.5/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
-github.com/free5gc/go-gtp5gnl v1.4.5 h1:w4mHuEue4hwpnQdYc19C5sXmxvYLZ0s2vJyDNdmt2wk=
-github.com/free5gc/go-gtp5gnl v1.4.5/go.mod h1:TT5aXB90NuSPMehuIK9lV2yJFnq6Qjw37ZqNB1QAKh0=
-github.com/free5gc/nas v1.1.1 h1:xUsqOOrb3kH38TQCzwZY7WN6WJkIerjERNjORDtnCbo=
-github.com/free5gc/nas v1.1.1/go.mod h1:fjWwpyp7/wOyL72HTkjvIe9YTCfGyZosjITsI5sXyuU=
 github.com/free5gc/openapi v1.0.6 h1:ytRjU/YZRI8UhKKyfajXSyGB6s1YDFkJ1weeAGJ8LXw=
 github.com/free5gc/openapi v1.0.6/go.mod h1:iw/N0E+FlX44EEx24IBi2EdZW8v+bkj3ETWPGnlK9DI=
 github.com/free5gc/util v1.0.4 h1:GxliLpjI3NHMrKck3PDfx4OLJUuBjU182sVj+zbZK50=
@@ -39,12 +37,6 @@ github.com/ishidawataru/sctp v0.0.0-20230406120618-7ff4192f6ff2 h1:i2fYnDurfLlJH
 github.com/ishidawataru/sctp v0.0.0-20230406120618-7ff4192f6ff2/go.mod h1:co9pwDoBCm1kGxawmb4sPq0cSIOOWNPT4KnHotMP1Zg=
 github.com/jtolds/gls v4.20.0+incompatible h1:xdiiI2gbIgH/gLH7ADydsJ1uDOEzR8yvV7C0MuV77Wo=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
-github.com/khirono/go-genl v1.0.1 h1:9/7V52C/lkifC0zjZZaAN6GghQSLZkuNz87vxemyzeY=
-github.com/khirono/go-genl v1.0.1/go.mod h1:EQ4XpG8LUJTtozdrgcsAgJm++r3l94/LwCia4Rq4Scs=
-github.com/khirono/go-nl v1.0.4 h1:MKdgv6HiJyFvM5qb8r7Sy6LbcUmK4yB7542u6JM0sBE=
-github.com/khirono/go-nl v1.0.4/go.mod h1:PzYeSjD38fzV7mX5DuaCZvnwx2kD/o7XgHyzuJxoi7U=
-github.com/khirono/go-rtnllink v1.1.1 h1:VsJbbW2HbqIZ62qit5FsehxR0gnrfDp7GE9fSTqHUDY=
-github.com/khirono/go-rtnllink v1.1.1/go.mod h1:FqrOS6/iGjmK30oNB3snEtXXd0JRT9nJ/98/605IiO0=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=

@@ -9,10 +9,10 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/handler"
 	"reflect"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
-	"github.com/free5gc/nas/security"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
+	"github.com/BENHSU0723/nas/security"
 	log "github.com/sirupsen/logrus"
 )
 

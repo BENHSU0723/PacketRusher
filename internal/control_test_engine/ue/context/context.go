@@ -19,8 +19,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/free5gc/nas/nasType"
-	"github.com/free5gc/nas/security"
+	"github.com/BENHSU0723/nas/nasType"
+	"github.com/BENHSU0723/nas/security"
 
 	"my5G-RANTester/internal/common/auth"
 

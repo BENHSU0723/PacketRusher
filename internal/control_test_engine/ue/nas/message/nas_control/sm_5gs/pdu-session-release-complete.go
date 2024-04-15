@@ -7,8 +7,9 @@ package sm_5gs
 import (
 	"bytes"
 	"fmt"
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
+
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
 )
 
 func GetPduSessionReleaseComplete(pduSessionId uint8) (nasPdu []byte) {

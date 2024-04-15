@@ -12,11 +12,12 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control"
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/nas_control/sm_5gs"
 
-	"github.com/free5gc/nas"
-	"github.com/free5gc/nas/nasMessage"
-	"github.com/free5gc/nas/nasType"
+	"github.com/BENHSU0723/nas"
+	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/nas/nasType"
 
 	"github.com/free5gc/openapi/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func Request_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UEContext) ([]byte, error) {
@@ -76,6 +77,7 @@ func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn st
 	ulNasTransport.PduSessionID2Value = new(nasType.PduSessionID2Value)
 	ulNasTransport.PduSessionID2Value.SetIei(nasMessage.ULNASTransportPduSessionID2ValueType)
 	ulNasTransport.PduSessionID2Value.SetPduSessionID2Value(pduSessionId)
+	log.Warnln("pduSessionId: ", pduSessionId)
 	ulNasTransport.RequestType = new(nasType.RequestType)
 	ulNasTransport.RequestType.SetIei(nasMessage.ULNASTransportRequestTypeType)
 	ulNasTransport.RequestType.SetRequestTypeValue(nasMessage.ULNASTransportRequestTypeInitialRequest)
@@ -114,6 +116,10 @@ func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn st
 	}
 
 	nasPdu = data.Bytes()
+	log.Warnf("[GamMessage][ulNasTransport]:%+v\n", *ulNasTransport)
+	log.Warnf("[GamMessage][byteData]:%+v\n", nasPdu)
+	log.Warnf("[GsmMessage][payload content]:%+v\n", pduSessionEstablishmentRequest)
+
 	return
 }
 

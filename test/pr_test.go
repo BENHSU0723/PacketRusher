@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )

@@ -9,7 +9,7 @@ import (
 	"my5G-RANTester/test/aio5gc/context"
 	"my5G-RANTester/test/aio5gc/msg"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 )
 
 func RegistrationComplete(nasMsg *nas.Message, gnb *context.GNBContext, ue *context.UEContext, amf context.AMFContext) error {

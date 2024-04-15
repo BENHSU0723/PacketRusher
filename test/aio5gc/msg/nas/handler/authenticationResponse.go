@@ -12,7 +12,7 @@ import (
 	"my5G-RANTester/test/aio5gc/msg"
 	"strings"
 
-	"github.com/free5gc/nas"
+	"github.com/BENHSU0723/nas"
 
 	log "github.com/sirupsen/logrus"
 )
