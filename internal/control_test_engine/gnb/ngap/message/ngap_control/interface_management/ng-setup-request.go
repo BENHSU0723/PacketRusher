@@ -9,6 +9,8 @@ import (
 	"my5G-RANTester/lib/aper"
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
@@ -83,20 +85,24 @@ func BuildNGSetupRequest(gnb *context.GNBContext) (pdu ngapType.NGAPPDU) {
 
 	sliceSupportList := &broadcastPLMNItem.TAISliceSupportList
 
-	// SliceSupportItem in SliceSupportList
-	sliceSupportItem := ngapType.SliceSupportItem{}
-	sst, sd := gnb.GetSliceInBytes()
+	sliceSupportListLen := gnb.GetSliceListLength()
+	log.Warnf("sliceSupportListLen:%+v\n", sliceSupportListLen)
+	for i := 0; i < sliceSupportListLen; i++ {
+		// SliceSupportItem in SliceSupportList
+		sliceSupportItem := ngapType.SliceSupportItem{}
+		sst, sd := gnb.GetSliceInBytes(i)
 
-	// sliceSupportItem.SNSSAI.SST.Value = aper.OctetString("\x01")
-	sliceSupportItem.SNSSAI.SST.Value = sst
+		// sliceSupportItem.SNSSAI.SST.Value = aper.OctetString("\x01")
+		sliceSupportItem.SNSSAI.SST.Value = sst
 
-	// sliceSupportItem.SNSSAI.SD.Value = aper.OctetString("\x01\x02\x03")
-	if sd != nil {
-		sliceSupportItem.SNSSAI.SD = new(ngapType.SD)
-		sliceSupportItem.SNSSAI.SD.Value = sd
+		// sliceSupportItem.SNSSAI.SD.Value = aper.OctetString("\x01\x02\x03")
+		if sd != nil {
+			sliceSupportItem.SNSSAI.SD = new(ngapType.SD)
+			sliceSupportItem.SNSSAI.SD.Value = sd
+		}
+		sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
 	}
-
-	sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
+	log.Warnf("sliceSupportList.List :%+v\n", sliceSupportList.List)
 
 	broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
 

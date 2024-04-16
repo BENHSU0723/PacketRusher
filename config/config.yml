@@ -11,23 +11,33 @@ gnodeb:
     tac: "000001"
     gnbid: "000008"
   slicesupportlist:
-    sst: "01"
-    sd: "010203" # optional, can be removed if not used
+    - sst: "01"
+      sd: "010203" # optional, can be removed if not used
+    - sst: "01"
+      sd: "112233" # optional, can be removed if not used
 
 ue:
   msin: "0000000003"
   key: "8baf473f2f8fd09487cccbd7097c6862"
   opc: "8e27b6af0e692e750f32667a3b14605d"
   amf: "8000"
-  sqn: "00000000"
+  sqn: "000000000032"
   dnn: "internet"
   routingindicator: "0000"
   hplmn:
     mcc: "208"
     mnc: "93"
-  snssai:
-    sst: 01
-    sd: "010203" # optional, can be removed if not used
+  snssailist:
+    - sst: 01
+      sd: "010203" # default PDU session session used
+    - sst: 01
+      sd: "112233"
+  # sessions:     # currently no used
+  #   - pduType: 'IPv4'
+  #     apn: 'internet'
+  #     slice:
+  #       sst: 0x01
+  #       sd: 0x010203
   integrity:
     nia0: false
     nia1: false

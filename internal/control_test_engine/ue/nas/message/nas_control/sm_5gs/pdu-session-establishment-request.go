@@ -14,7 +14,7 @@ import (
 	"github.com/BENHSU0723/nas/nasType"
 )
 
-func GetPduSessionEstablishmentRequest(pduSessionId uint8) (nasPdu []byte) {
+func GetPduSessionEstablishmentRequest(pduSessionId uint8, pduType uint8) (nasPdu []byte) {
 
 	m := nas.NewMessage()
 	m.GsmMessage = nas.NewGsmMessage()
@@ -29,7 +29,8 @@ func GetPduSessionEstablishmentRequest(pduSessionId uint8) (nasPdu []byte) {
 	pduSessionEstablishmentRequest.IntegrityProtectionMaximumDataRate.SetMaximumDataRatePerUEForUserPlaneIntegrityProtectionForUpLink(0xff)
 
 	pduSessionEstablishmentRequest.PDUSessionType = nasType.NewPDUSessionType(nasMessage.PDUSessionEstablishmentRequestPDUSessionTypeType)
-	pduSessionEstablishmentRequest.PDUSessionType.SetPDUSessionTypeValue(uint8(0x01)) //IPv4 type
+	// pduSessionEstablishmentRequest.PDUSessionType.SetPDUSessionTypeValue(uint8(0x01)) //IPv4 type
+	pduSessionEstablishmentRequest.PDUSessionType.SetPDUSessionTypeValue(pduType) //IPv4 type
 
 	pduSessionEstablishmentRequest.ExtendedProtocolConfigurationOptions = nasType.NewExtendedProtocolConfigurationOptions(nasMessage.PDUSessionEstablishmentRequestExtendedProtocolConfigurationOptionsType)
 	protocolConfigurationOptions := nasConvert.NewProtocolConfigurationOptions()

@@ -15,6 +15,7 @@ import (
 	"my5G-RANTester/internal/control_test_engine/ue/nas/message/sender"
 
 	"github.com/BENHSU0723/nas/nasMessage"
+	"github.com/BENHSU0723/openapi/models"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -36,7 +37,7 @@ func InitRegistration(ue *context.UEContext) {
 	ue.SetStateMM_DEREGISTERED()
 }
 
-func InitPduSessionRequest(ue *context.UEContext) {
+func InitPduSessionRequest(ue *context.UEContext, pduType uint8, slice *models.Snssai, dnn *string) (pduId uint8) {
 	log.Info("[UE] Initiating New PDU Session")
 
 	pduSession, err := ue.CreatePDUSession()
@@ -45,13 +46,18 @@ func InitPduSessionRequest(ue *context.UEContext) {
 		return
 	}
 
-	InitPduSessionRequestInner(ue, pduSession)
+	if slice != nil && dnn != nil {
+		InitPduSessionRequestInner(ue, pduSession, pduType, slice, dnn)
+	} else {
+		InitPduSessionRequestInner(ue, pduSession, pduType, nil, nil)
+	}
+	return pduSession.Id
 }
 
-func InitPduSessionRequestInner(ue *context.UEContext, pduSession *context.UEPDUSession) {
+func InitPduSessionRequestInner(ue *context.UEContext, pduSession *context.UEPDUSession, pduType uint8, slice *models.Snssai, dnn *string) {
 	log.Info("[UE] Initiating New PDU Session")
 	log.Warn("[UE][PDU] PDU session ID:", *&pduSession.Id)
-	ulNasTransport, err := mm_5gs.Request_UlNasTransport(pduSession, ue)
+	ulNasTransport, err := mm_5gs.Request_UlNasTransport(pduSession, ue, pduType, slice, dnn)
 	if err != nil {
 		log.Fatal("[UE][NAS] Error sending ul nas transport and pdu session establishment request: ", err)
 	}

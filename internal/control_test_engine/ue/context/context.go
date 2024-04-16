@@ -13,6 +13,7 @@ import (
 	"my5G-RANTester/internal/control_test_engine/gnb/context"
 	"my5G-RANTester/internal/control_test_engine/ue/scenario"
 	"my5G-RANTester/lib/UeauCommon"
+	"my5G-RANTester/config"
 	"my5G-RANTester/lib/milenage"
 	"net"
 	"reflect"
@@ -54,7 +55,7 @@ type UEContext struct {
 
 	// TODO: Modify config so you can configure these parameters per PDUSession
 	Dnn           string
-	Snssai        models.Snssai
+	SnssaiList []models.Snssai
 	TunnelEnabled bool
 
 	// Sync primitive
@@ -110,7 +111,7 @@ type SECURITY struct {
 func (ue *UEContext) NewRanUeContext(msin string,
 	ueSecurityCapability *nasType.UESecurityCapability,
 	k, opc, op, amf, sqn, mcc, mnc, routingIndicator, dnn string,
-	sst int32, sd string, tunnelEnabled bool, scenarioChan chan scenario.ScenarioMessage,
+	snssaiList []config.Snssai, tunnelEnabled bool, scenarioChan chan scenario.ScenarioMessage,
 	id int) {
 
 	// added SUPI.
@@ -147,8 +148,13 @@ func (ue *UEContext) NewRanUeContext(msin string,
 	ue.prUeId = int64(id)
 
 	// added network slice
-	ue.Snssai.Sd = sd
-	ue.Snssai.Sst = sst
+	for _, snssai := range snssaiList {
+		newSnssai := models.Snssai{
+			Sst: int32(snssai.Sst),
+			Sd:  snssai.Sd,
+		}
+		ue.SnssaiList = append(ue.SnssaiList, newSnssai)
+	}
 
 	// added Domain Network Name.
 	ue.Dnn = dnn
@@ -397,6 +403,10 @@ func (ue *UEContext) deriveSNN() string {
 
 func (ue *UEContext) GetUeSecurityCapability() *nasType.UESecurityCapability {
 	return ue.UeSecurity.UeSecurityCapability
+}
+
+func (ue *UEContext) GetHplmn() (string, string) {
+	return ue.UeSecurity.mcc, ue.UeSecurity.mnc
 }
 
 func (ue *UEContext) GetMccAndMncInOctets() []byte {

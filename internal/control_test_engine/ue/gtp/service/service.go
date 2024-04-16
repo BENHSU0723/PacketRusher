@@ -13,6 +13,7 @@ import (
 	"net"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -55,7 +56,8 @@ func SetupGtpInterface(ue *context.UEContext, msg gnbContext.UEMessage) {
 	}
 
 	tableId, _ := strconv.ParseInt(fmt.Sprint(gnbPduSession.GetTeidUplink()), 10, 32)
-	ueVrfInf := fmt.Sprintf("vrf%s", ue.GetMsin())
+	// ueVrfInf := fmt.Sprintf("vrf%s", ue.GetMsin())
+	ueVrfInf := "vrf-" + ue.GetMsin()[len(ue.GetMsin())-3:] + "-" + strings.Replace(pduSession.GetIp(), ".", "", -1)
 	ueIp := pduSession.GetIp()
 
 	/*

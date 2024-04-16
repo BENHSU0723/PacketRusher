@@ -40,8 +40,7 @@ func NewUE(conf config.Config, id int, ueMgrChannel chan procedures.UeTesterMess
 		conf.Ue.Hplmn.Mnc,
 		conf.Ue.RoutingIndicator,
 		conf.Ue.Dnn,
-		int32(conf.Ue.Snssai.Sst),
-		conf.Ue.Snssai.Sd,
+		conf.Ue.SnssaiList,
 		conf.Ue.TunnelEnabled,
 		scenarioChan,
 		id)
@@ -105,7 +104,7 @@ func ueMgrHandler(msg procedures.UeTesterMessage, ue *context.UEContext) bool {
 	case procedures.Deregistration:
 		trigger.InitDeregistration(ue)
 	case procedures.NewPDUSession:
-		trigger.InitPduSessionRequest(ue)
+		trigger.InitPduSessionRequest(ue, 0x01, nil, nil) // 0x01 means IP type PDU session
 	case procedures.DestroyPDUSession:
 		pdu, err := ue.GetPduSession(msg.Param)
 		if err == nil {

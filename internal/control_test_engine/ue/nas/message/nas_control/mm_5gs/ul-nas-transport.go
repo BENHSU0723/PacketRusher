@@ -20,9 +20,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Request_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UEContext) ([]byte, error) {
-
-	pdu := getUlNasTransport_PduSessionEstablishmentRequest(pduSession.Id, ue.Dnn, &ue.Snssai)
+func Request_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UEContext, pduType uint8, slice *models.Snssai, dnn *string) ([]byte, error) {
+	var pdu []byte
+	if slice != nil && dnn != nil {
+		log.Warnf("InitPduSessionRequest: pduType[%v], dnn[%v], slice[%v]\n", pduType, *dnn, *slice)
+		pdu = getUlNasTransport_PduSessionEstablishmentRequest(pduSession.Id, *dnn, slice, pduType)
+	} else {
+		pdu = getUlNasTransport_PduSessionEstablishmentRequest(pduSession.Id, ue.Dnn, &ue.SnssaiList[0], pduType)
+	}
 	if pdu == nil {
 		return nil, fmt.Errorf("Error encoding %s IMSI UE PduSession Establishment Request Msg", ue.UeSecurity.Supi)
 	}
@@ -50,7 +55,7 @@ func Release_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UECont
 
 func ReleasComplete_UlNasTransport(pduSession *context.UEPDUSession, ue *context.UEContext) ([]byte, error) {
 
-	pdu := getUlNasTransport_PduSessionReleaseComplete(pduSession.Id, ue.Dnn, &ue.Snssai)
+	pdu := getUlNasTransport_PduSessionReleaseComplete(pduSession.Id, ue.Dnn, &ue.SnssaiList[0])
 	if pdu == nil {
 		return nil, fmt.Errorf("Error encoding %s IMSI UE PduSession Establishment Request Msg", ue.UeSecurity.Supi)
 	}
@@ -62,9 +67,9 @@ func ReleasComplete_UlNasTransport(pduSession *context.UEPDUSession, ue *context
 	return pdu, nil
 }
 
-func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn string, sNssai *models.Snssai) (nasPdu []byte) {
+func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn string, sNssai *models.Snssai, pduType uint8) (nasPdu []byte) {
 
-	pduSessionEstablishmentRequest := sm_5gs.GetPduSessionEstablishmentRequest(pduSessionId)
+	pduSessionEstablishmentRequest := sm_5gs.GetPduSessionEstablishmentRequest(pduSessionId, pduType)
 
 	m := nas.NewMessage()
 	m.GmmMessage = nas.NewGmmMessage()
@@ -116,10 +121,6 @@ func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn st
 	}
 
 	nasPdu = data.Bytes()
-	log.Warnf("[GamMessage][ulNasTransport]:%+v\n", *ulNasTransport)
-	log.Warnf("[GamMessage][byteData]:%+v\n", nasPdu)
-	log.Warnf("[GsmMessage][payload content]:%+v\n", pduSessionEstablishmentRequest)
-
 	return
 }
 

@@ -248,6 +248,10 @@ func (pduSession *GnbPDUSession) SetUpfIp(upfIp string) {
 	pduSession.upfIp = upfIp
 }
 
+func (pduSession *GnbPDUSession) GetSNSSAI() (string, string) {
+	return pduSession.sst, pduSession.sd
+}
+
 func (pduSession *GnbPDUSession) GetTeidUplink() uint32 {
 	return pduSession.uplinkTeid
 }

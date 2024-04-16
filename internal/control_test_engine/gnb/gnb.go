@@ -5,7 +5,6 @@
 package gnb
 
 import (
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine/gnb/context"
 	serviceNas "my5G-RANTester/internal/control_test_engine/gnb/nas/service"
@@ -16,6 +15,8 @@ import (
 	"os/signal"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func InitGnb(conf config.Config, wg *sync.WaitGroup) *context.GNBContext {
@@ -29,8 +30,7 @@ func InitGnb(conf config.Config, wg *sync.WaitGroup) *context.GNBContext {
 		conf.GNodeB.PlmnList.Mcc,
 		conf.GNodeB.PlmnList.Mnc,
 		conf.GNodeB.PlmnList.Tac,
-		conf.GNodeB.SliceSupportList.Sst,
-		conf.GNodeB.SliceSupportList.Sd,
+		conf.GNodeB.SliceSupportList,
 		conf.GNodeB.ControlIF.Ip,
 		conf.GNodeB.DataIF.Ip,
 		conf.GNodeB.ControlIF.Port,
@@ -80,8 +80,7 @@ func InitGnbForLoadSeconds(conf config.Config, wg *sync.WaitGroup,
 		conf.GNodeB.PlmnList.Mcc,
 		conf.GNodeB.PlmnList.Mnc,
 		conf.GNodeB.PlmnList.Tac,
-		conf.GNodeB.SliceSupportList.Sst,
-		conf.GNodeB.SliceSupportList.Sd,
+		conf.GNodeB.SliceSupportList,
 		conf.GNodeB.ControlIF.Ip,
 		conf.GNodeB.DataIF.Ip,
 		conf.GNodeB.ControlIF.Port,
@@ -123,8 +122,7 @@ func InitGnbForAvaibility(conf config.Config,
 		conf.GNodeB.PlmnList.Mcc,
 		conf.GNodeB.PlmnList.Mnc,
 		conf.GNodeB.PlmnList.Tac,
-		conf.GNodeB.SliceSupportList.Sst,
-		conf.GNodeB.SliceSupportList.Sd,
+		conf.GNodeB.SliceSupportList,
 		conf.GNodeB.ControlIF.Ip,
 		conf.GNodeB.DataIF.Ip,
 		conf.GNodeB.ControlIF.Port,
