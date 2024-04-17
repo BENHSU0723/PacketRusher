@@ -36,21 +36,20 @@ func (a *Aio5gc) Init(conf config.Config, id string, name string) error {
 		Mcc: conf.GNodeB.PlmnList.Mcc,
 		Mnc: conf.GNodeB.PlmnList.Mnc,
 	}
-	i, err := strconv.ParseInt(conf.GNodeB.SliceSupportList.Sst, 10, 32)
-	if err != nil {
-		err = errors.New("failed to convert config sst to int: " + err.Error())
-		return err
+	var sliceList []models.Snssai
+	for _, sliceItem := range conf.GNodeB.SliceSupportList {
+		i, err := strconv.ParseInt(sliceItem.Sst, 10, 32)
+		if err != nil {
+			err = errors.New("failed to convert config sst to int: " + err.Error())
+			return err
+		}
+		sst := int32(i)
+		sliceList = append(sliceList, models.Snssai{Sst: sst, Sd: sliceItem.Sd})
 	}
-	sst := int32(i)
 	supportedPlmns := []models.PlmnSnssai{
 		{
-			PlmnId: &plmn,
-			SNssaiList: []models.Snssai{
-				{
-					Sst: sst,
-					Sd:  conf.GNodeB.SliceSupportList.Sd,
-				},
-			},
+			PlmnId:     &plmn,
+			SNssaiList: sliceList,
 		}}
 	servedGuami := []models.Guami{
 		{

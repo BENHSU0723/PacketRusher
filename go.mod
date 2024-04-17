@@ -3,7 +3,7 @@ module my5G-RANTester
 go 1.21
 
 require (
-	github.com/BENHSU0723/nas v1.1.2-0.20240319115314-3d37312fdd02
+	github.com/BENHSU0723/nas v1.1.2-0.20240417072341-61d3de7a07f3
 	github.com/BENHSU0723/openapi v1.0.7-0.20240409072038-dc20cee177e7
 	github.com/RoaringBitmap/roaring v1.3.0
 	github.com/cilium/ebpf v0.12.3

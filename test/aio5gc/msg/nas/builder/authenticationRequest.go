@@ -16,6 +16,7 @@ import (
 	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/BENHSU0723/nas/nasType"
 	"github.com/BENHSU0723/openapi/models"
+	freeModels "github.com/free5gc/openapi/models"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -60,7 +61,7 @@ func buildAuthenticationRequest(ue *context.UEContext, authCtx models.UeAuthenti
 	authenticationRequest.SpareHalfOctetAndSecurityHeaderType.SetSecurityHeaderType(nas.SecurityHeaderTypePlainNas)
 	authenticationRequest.SpareHalfOctetAndSecurityHeaderType.SetSpareHalfOctet(0)
 	authenticationRequest.AuthenticationRequestMessageIdentity.SetMessageType(nas.MsgTypeAuthenticationRequest)
-	authenticationRequest.SpareHalfOctetAndNgksi = nasConvert.SpareHalfOctetAndNgksiToNas(ue.GetNgKsi())
+	authenticationRequest.SpareHalfOctetAndNgksi = nasConvert.SpareHalfOctetAndNgksiToNas(freeModels.NgKsi{Tsc: freeModels.ScType(ue.GetNgKsi().Tsc), Ksi: ue.GetNgKsi().Ksi})
 
 	// Dummy abba, not supported by PR for now
 	abba := []uint8{0x00, 0x00}

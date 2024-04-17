@@ -470,26 +470,18 @@ func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.
 
 	switch uePolContainer.GetHeaderMessageType() {
 	case uePolicyContainer.MsgTypeManageUEPolicyCommand:
+		// The procedure refer to TS24501 v17.7.1, chapter D.2.1 Network-requested UE policy management procedure
 		err := HandleMsgTypeManageUEPolicyCommand(uePolContainer, ue)
 		if err != nil {
 			return fmt.Errorf("[UE][NAS] Error of decoding [DecodeMsgTypeManageUEPolicyCommand]: %+v", err)
 		}
-	case uePolicyContainer.MsgTypeManageUEPolicyComplete:
-		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeManageUEPolicyComplete] unhandle...")
-	case uePolicyContainer.MsgTypeManageUEPolicyReject:
-		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeManageUEPolicyReject] unhandle...")
-
-	case uePolicyContainer.MsgTypeUEStateIndication:
-		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeUEStateIndication] unhandle...")
-
-	case uePolicyContainer.MsgTypeUEPolicyProvisioningRequest:
-		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeUEPolicyProvisioningRequest] unhandle...")
+		// if all UE policy can be executed by UE, then response "MANAGE UE POLICY COMPLETE" to PCF using NAS UL Transport
 
 	case uePolicyContainer.MsgTypeUEPolicyProvisioningReject:
+		// It's V2X related policy communication, refer to TS.24587, chapter 5.3.2
 		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeUEPolicyProvisioningReject] unhandle...")
-
 	default:
-
+		log.Fatalf("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type %v is not supported yet\n", uePolContainer.GetHeaderMessageType())
 	}
 
 	return nil

@@ -14,6 +14,7 @@ import (
 	"github.com/BENHSU0723/nas/nasConvert"
 	"github.com/BENHSU0723/nas/nasMessage"
 	"github.com/BENHSU0723/nas/nasType"
+	freeModels "github.com/free5gc/openapi/models"
 )
 
 func PDUSessionEstablishmentAccept(ue *context.UEContext, smContext *context.SmContext) (msg []byte, err error) {
@@ -108,7 +109,7 @@ func buildSessionEstablishmentAccept(ue *context.UEContext, smContext *context.S
 	pDUSessionEstablishmentAccept.AuthorizedQosRules.SetLen(uint16(len(qosRulesBytes)))
 	pDUSessionEstablishmentAccept.AuthorizedQosRules.SetQosRule(qosRulesBytes)
 
-	pDUSessionEstablishmentAccept.SessionAMBR = nasConvert.ModelsToSessionAMBR(sessRule.AuthSessAmbr)
+	pDUSessionEstablishmentAccept.SessionAMBR = nasConvert.ModelsToSessionAMBR((*freeModels.Ambr)(sessRule.AuthSessAmbr))
 	pDUSessionEstablishmentAccept.SessionAMBR.SetLen(uint8(len(pDUSessionEstablishmentAccept.SessionAMBR.Octet)))
 
 	addr, addrLen := smContext.PDUAddressToNAS()
