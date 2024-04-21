@@ -67,6 +67,46 @@ func ReleasComplete_UlNasTransport(pduSession *context.UEPDUSession, ue *context
 	return pdu, nil
 }
 
+func UePolicy_UlNasTransport(payloadContainer []uint8, ue *context.UEContext) ([]byte, error) {
+	nasUePolicy := getUlNasTransport_UePolicyPayload(payloadContainer)
+	if nasUePolicy == nil {
+		return nil, fmt.Errorf("Error encoding %s UE Policy Info to UL NAS Transport Msg", ue.UeSecurity.Supi)
+	}
+	nasUePolicy, err := nas_control.EncodeNasPduWithSecurity(ue, nasUePolicy, nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true, false)
+	if err != nil {
+		return nil, fmt.Errorf("Error encoding %s UE Policy Info to UL NAS Transport Msg", ue.UeSecurity.Supi)
+	}
+
+	return nasUePolicy, nil
+}
+
+func getUlNasTransport_UePolicyPayload(payloadContainer []uint8) []byte {
+	m := nas.NewMessage()
+	m.GmmMessage = nas.NewGmmMessage()
+	m.GmmHeader.SetMessageType(nas.MsgTypeULNASTransport)
+	ulNasTransport := nasMessage.NewULNASTransport(0)
+	ulNasTransport.SpareHalfOctetAndSecurityHeaderType.SetSecurityHeaderType(nas.SecurityHeaderTypePlainNas)
+	ulNasTransport.SetMessageType(nas.MsgTypeULNASTransport)
+	ulNasTransport.ExtendedProtocolDiscriminator.SetExtendedProtocolDiscriminator(nasMessage.Epd5GSMobilityManagementMessage)
+	ulNasTransport.RequestType = new(nasType.RequestType)
+	ulNasTransport.RequestType.SetIei(nasMessage.ULNASTransportRequestTypeType)
+	ulNasTransport.RequestType.SetRequestTypeValue(nasMessage.ULNASTransportRequestTypeInitialRequest)
+
+	ulNasTransport.SpareHalfOctetAndPayloadContainerType.SetPayloadContainerType(nasMessage.PayloadContainerTypeUEPolicy)
+	ulNasTransport.PayloadContainer.SetLen(uint16(len(payloadContainer)))
+	ulNasTransport.PayloadContainer.SetPayloadContainerContents(payloadContainer)
+
+	m.GmmMessage.ULNASTransport = ulNasTransport
+
+	nasData := new(bytes.Buffer)
+	err := m.GmmMessageEncode(nasData)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return nasData.Bytes()
+}
+
 func getUlNasTransport_PduSessionEstablishmentRequest(pduSessionId uint8, dnn string, sNssai *models.Snssai, pduType uint8) (nasPdu []byte) {
 
 	pduSessionEstablishmentRequest := sm_5gs.GetPduSessionEstablishmentRequest(pduSessionId, pduType)

@@ -8,6 +8,7 @@ require (
 	github.com/RoaringBitmap/roaring v1.3.0
 	github.com/cilium/ebpf v0.12.3
 	github.com/davecgh/go-spew v1.1.1
+	github.com/free5gc/openapi v1.0.6
 	github.com/free5gc/util v1.0.4
 	github.com/google/gopacket v1.1.19
 	github.com/ishidawataru/sctp v0.0.0-20230406120618-7ff4192f6ff2
@@ -32,7 +33,6 @@ require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1 // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/free5gc/openapi v1.0.6 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect

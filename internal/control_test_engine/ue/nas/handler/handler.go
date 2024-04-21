@@ -471,12 +471,20 @@ func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.
 	switch uePolContainer.GetHeaderMessageType() {
 	case uePolicyContainer.MsgTypeManageUEPolicyCommand:
 		// The procedure refer to TS24501 v17.7.1, chapter D.2.1 Network-requested UE policy management procedure
-		err := HandleMsgTypeManageUEPolicyCommand(uePolContainer, ue)
+		err := HandleMsgTypeManageUEPolicyCommand(ue, uePolContainer)
 		if err != nil {
-			return fmt.Errorf("[UE][NAS] Error of decoding [DecodeMsgTypeManageUEPolicyCommand]: %+v", err)
+			// If the UE could not execute all instructions included in the UE policy section management list IE successfully,
+			// then create a "MANAGE UE POLICY COMMAND REJECT" message and transport to PCF using NAS UL Transport, refer to TS24501v17-D.2.1.4
+			log.Errorf("[UE][NAS] Error of decoding [DecodeMsgTypeManageUEPolicyCommand]: %+v", err)
+			if err := SendManageUEPolicyCompleteRsp2PCF(ue, uePolContainer); err != nil {
+				return fmt.Errorf("[UE][NAS] Error of Sending 'Manage UE Policy Complete' message to PCF: %+v", err)
+			}
 		}
-		// if all UE policy can be executed by UE, then response "MANAGE UE POLICY COMPLETE" to PCF using NAS UL Transport
-
+		// If all instructions included in the UE policy section management list IE were executed successfully by the UE,
+		// then create a "MANAGE UE POLICY COMPLETE" message and transport to PCF using NAS UL Transport, refer to TS24501v17-D.2.1.3
+		if err := SendManageUEPolicyCompleteRsp2PCF(ue, uePolContainer); err != nil {
+			return fmt.Errorf("[UE][NAS] Error of Sending 'Manage UE Policy Complete' message to PCF: %+v", err)
+		}
 	case uePolicyContainer.MsgTypeUEPolicyProvisioningReject:
 		// It's V2X related policy communication, refer to TS.24587, chapter 5.3.2
 		log.Fatal("[UE][NAS] Error in DL NAS Transport, Payload Container is UE Policy, but type of [MsgTypeUEPolicyProvisioningReject] unhandle...")
@@ -487,7 +495,49 @@ func HandlerDlNasTransportUePolicyContainer(ue *context.UEContext, message *nas.
 	return nil
 }
 
-func HandleMsgTypeManageUEPolicyCommand(uePolContainer uePolicyContainer.UePolicyContainer, ue *context.UEContext) error {
+// TODO: build reject message and transport to PCF
+func SendManageUEPolicyCommandRejectRsp2PCF(ue *context.UEContext, uePolContainer uePolicyContainer.UePolicyContainer) error {
+	log.Warnln("Start to Send Manage UE Policy Command Reject msg to PCF via UL NAS Transport")
+	log.Warnln("This Procedure is still unhandle yet!!!")
+	return nil
+}
+
+func SendManageUEPolicyCompleteRsp2PCF(ue *context.UEContext, uePolContainer uePolicyContainer.UePolicyContainer) error {
+	log.Warnln("Start to Send Manage UE Policy Complete msg to PCF via UL NAS Transport")
+	if uePolContainer.ManageUEPolicyCommand == nil {
+		return fmt.Errorf("ManageUEPolicyCommand is nil data")
+	}
+
+	// set header type first
+	rspData := uePolicyContainer.NewUePolDeliverySer()
+	rspData.SetHeaderMessageType(uePolicyContainer.MsgTypeManageUEPolicyComplete)
+	originPTI := uePolContainer.ManageUEPolicyCommand.GetPTI()
+	rspData.SetHeaderPTI(originPTI)
+
+	// set Rsp data
+	rspData.ManageUEPolicyComplete = uePolicyContainer.NewManageUEPolicyComplete(uePolicyContainer.MsgTypeManageUEPolicyComplete)
+	mngUePolCompData := rspData.ManageUEPolicyComplete
+	mngUePolCompData.SetPTI(originPTI)
+
+	rspByteData, err := rspData.UePolDeliverySerEncode()
+	if err != nil {
+		return err
+	}
+
+	// Send Response Data through UL-NAS-Transport
+	log.Warnf("[UE][ManageUEPolicyComplete] data:%+v", mngUePolCompData)
+	ulNasTransport, err := mm_5gs.UePolicy_UlNasTransport(rspByteData, ue)
+	if err != nil {
+		log.Fatal("[UE][NAS] Error sending ul nas transport and pdu session establishment request: ", err)
+	}
+
+	// sending to GNB
+	sender.SendToGnb(ue, ulNasTransport)
+
+	return nil
+}
+
+func HandleMsgTypeManageUEPolicyCommand(ue *context.UEContext, uePolContainer uePolicyContainer.UePolicyContainer) error {
 	var uePolSecMngLsContent uePolicyContainer.UEPolicySectionManagementListContent
 	// decoding the byte content
 	// log.Warnf("section mng list content: %v\n", uePolContainer.ManageUEPolicyCommand.GetUEPolicySectionManagementListContent())
