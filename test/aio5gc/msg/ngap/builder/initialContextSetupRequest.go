@@ -9,6 +9,8 @@ import (
 	"my5G-RANTester/lib/ngap/ngapConvert"
 	"my5G-RANTester/lib/ngap/ngapType"
 	"my5G-RANTester/test/aio5gc/context"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func InitialContextSetupRequest(nasPdu []byte, ue *context.UEContext, amf context.AMFContext) ([]byte, error) {
@@ -99,6 +101,7 @@ func buildInitialContextSetupRequest(nasPdu []byte, ue *context.UEContext, amf c
 		allowedNSSAIItem.SNSSAI = ngapSnssai
 		allowedNSSAI.List = append(allowedNSSAI.List, allowedNSSAIItem)
 	}
+	log.Warnf("buildInitialContextSetupRequest: allowedNSSAI:%v", allowedNSSAI.List)
 
 	initialContextSetupRequestIEs.List = append(initialContextSetupRequestIEs.List, ie)
 

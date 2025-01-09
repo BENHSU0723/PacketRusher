@@ -626,8 +626,8 @@ func HandleUePolicyPartTypeURSP(uePolicyPartContents []byte, ue *context.UEConte
 			if exist {
 				log.Warnf("[URSP][RouteSelectionComponent] match all RouteSelectionComponent with existed PDU session id:%v\n", pduId)
 			} else {
-				pduId = createPDUsessionByURSP(ue, capablePduAttri)
 				log.Warnf("Invoke createPDUsessionByURSP...")
+				pduId = createPDUsessionByURSP(ue, capablePduAttri)
 			}
 		}
 

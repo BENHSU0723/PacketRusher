@@ -123,7 +123,7 @@ func HandlerInitialContextSetupRequest(gnb *context.GNBContext, message *ngapTyp
 
 			// list S-NSSAI(Single – Network Slice Selection Assistance Information).
 			for i, items := range ies.Value.AllowedNSSAI.List {
-
+				log.Warnf("HandlerInitialContextSetupRequest ies.Value.AllowedNSSAI.List:%v", ies.Value.AllowedNSSAI.List)
 				if items.SNSSAI.SST.Value != nil {
 					sst[i] = fmt.Sprintf("%x", items.SNSSAI.SST.Value)
 				} else {

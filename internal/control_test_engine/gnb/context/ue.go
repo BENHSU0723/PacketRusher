@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/ishidawataru/sctp"
+	log "github.com/sirupsen/logrus"
 )
 
 // UE main states in the GNB Context.
@@ -68,7 +69,10 @@ func (ue *GNBUe) CreateUeContext(plmn string, imeisv string, sst []string, sd []
 	}
 
 	ue.context.maskedIMEISV = imeisv
+	log.Warnf("CreateUeContext: sst:%v, sd:%v", sst, sd)
+	ue.context.allowedSst = make([]string, len(sst))
 	ue.context.allowedSst = sst
+	ue.context.allowedSd = make([]string, len(sd))
 	ue.context.allowedSd = sd
 	ue.context.ueSecurityCapabilities = ueSecurityCapabilities
 }
@@ -92,9 +96,9 @@ func (ue *GNBUe) CreatePduSession(pduSessionId int64, upfIp string, sst string, 
 	var pduSession = new(GnbPDUSession)
 	pduSession.pduSessionId = pduSessionId
 	pduSession.upfIp = upfIp
-	if !ue.isWantedNssai(sst, sd) {
-		return nil, errors.New("Unable to create PDU Session, slice " + string(sst) + string(sd) + " is not selected for current UE")
-	}
+	// if !ue.isWantedNssai(sst, sd) {
+	// 	return nil, errors.New("Unable to create PDU Session, slice " + string(sst) + string(sd) + " is not selected for current UE")
+	// }
 	pduSession.pduType = pduType
 	pduSession.qosId = qosId
 	pduSession.priArp = priArp
@@ -158,6 +162,7 @@ func (ue *GNBUe) GetUESecurityCapabilities() *ngapType.UESecurityCapabilities {
 
 func (ue *GNBUe) isWantedNssai(sst string, sd string) bool {
 	if len(ue.context.allowedSst) == len(ue.context.allowedSd) {
+		log.Warnf("isWantedNssai, all ue allow sst:%v ,sd:%v\n", sst, sd)
 		for i := range ue.context.allowedSst {
 			if ue.context.allowedSst[i] == sst && ue.context.allowedSd[i] == sd {
 				return true

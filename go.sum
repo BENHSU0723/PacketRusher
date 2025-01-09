@@ -1,5 +1,7 @@
 github.com/BENHSU0723/nas v1.1.2-0.20240417072341-61d3de7a07f3 h1:XT7UeCHo24wEzkEK5Gg1Ix4Uc6wLS7CEG92SBlePYwg=
 github.com/BENHSU0723/nas v1.1.2-0.20240417072341-61d3de7a07f3/go.mod h1:KdDbh8IjZhQqMa2SuqLPNrS3fmCQDTOeZE8/XpLOaw0=
+github.com/BENHSU0723/nas v1.1.2-0.20240606075020-4a3df0a4d912 h1:DQn5qtDej4BTTKXCresF8d7i8sxWfuYT2GPrpj1ZCn0=
+github.com/BENHSU0723/nas v1.1.2-0.20240606075020-4a3df0a4d912/go.mod h1:KdDbh8IjZhQqMa2SuqLPNrS3fmCQDTOeZE8/XpLOaw0=
 github.com/BENHSU0723/openapi v1.0.7-0.20240409072038-dc20cee177e7 h1:Qbac7DM4ymv1UfUysXMHjViifgBg3W+5uNSHTLkAyhI=
 github.com/BENHSU0723/openapi v1.0.7-0.20240409072038-dc20cee177e7/go.mod h1:lJrGkB9rS/R3gxi9YLFyuWdTfu8djFDtZg1E+DxqY9c=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
